@@ -1,0 +1,15 @@
+ul {
+  display: flex;
+  flex-direction: row;
+  list-style-type: none;
+  margin-right: 10px;
+}
+
+li {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+li:hover {
+  color: darkgreen;
+}

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AuthGuardService } from './services/auth-guard.service';
 
 export const routes: Routes = [
   {
@@ -16,6 +17,7 @@ export const routes: Routes = [
         (c) => c.HomeComponent
       );
     },
+    canActivate: [AuthGuardService],
   },
   {
     path: 'categories',
@@ -24,6 +26,7 @@ export const routes: Routes = [
         (c) => c.CategoryListComponent
       );
     },
+    canActivate: [AuthGuardService],
   },
   {
     path: 'items',
@@ -32,6 +35,7 @@ export const routes: Routes = [
         (c) => c.ItemListComponent
       );
     },
+    canActivate: [AuthGuardService],
   },
   {
     path: 'sales',
@@ -40,6 +44,7 @@ export const routes: Routes = [
         (c) => c.SalesListComponent
       );
     },
+    canActivate: [AuthGuardService],
   },
   {
     path: '**',

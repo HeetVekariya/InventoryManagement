@@ -14,19 +14,11 @@ h3 {
   cursor: pointer;
 }
 
-ul {
-  display: flex;
-  flex-direction: row;
-  list-style-type: none;
-  margin-right: 10px;
-}
-
-li {
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-li:hover,
 h3:hover {
   color: darkgreen;
+}
+
+.login,
+.logout {
+  margin-right: 20px;
 }

@@ -1,10 +1,19 @@
 <header>
   <nav>
     <h3 routerLink="/">InvenTrack</h3>
-    <ul>
-      <li routerLink="/categories">Categories</li>
-      <li routerLink="/items">Items</li>
-      <li routerLink="/sales">Sales</li>
-    </ul>
+    <div *ngIf="authService.isAuthenticated$ | async; else loggedOut">
+      <button class="login" (click)="authService.logout()">Log Out</button>
+    </div>
+
+    <ng-template #loggedOut>
+      <button
+        class="logout"
+        (click)="
+          authService.loginWithRedirect({ appState: { target: '/home' } })
+        "
+      >
+        Log in
+      </button>
+    </ng-template>
   </nav>
 </header>
