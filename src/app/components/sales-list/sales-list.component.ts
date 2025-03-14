@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { SalesService } from '../../service/sales.service';
+import { SalesService } from '../../services/sales.service';
 import { CommonModule, NgIf } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
 

@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CategoryService } from '../../service/category.service';
+import { CategoryService } from '../../services/category.service';
 import { CommonModule, NgIf } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
 
