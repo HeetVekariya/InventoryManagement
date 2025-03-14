@@ -1,10 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { ItemService } from '../../service/item.service';
 import { CommonModule, NgIf } from '@angular/common';
+import { HeaderComponent } from '../header/header.component';
 
 @Component({
   selector: 'app-item-list',
-  imports: [NgIf, CommonModule],
+  imports: [NgIf, CommonModule, HeaderComponent],
   templateUrl: './item-list.component.html',
   styleUrl: './item-list.component.css',
 })
