@@ -1,0 +1,32 @@
+nav {
+  display: flex;
+  height: 50px;
+  width: 100%;
+  position: sticky;
+  justify-content: space-between;
+  align-items: center;
+  background-color: powderblue;
+  border-radius: 5px;
+}
+
+h3 {
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+ul {
+  display: flex;
+  flex-direction: row;
+  list-style-type: none;
+  margin-right: 10px;
+}
+
+li {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+li:hover,
+h3:hover {
+  color: darkgreen;
+}
