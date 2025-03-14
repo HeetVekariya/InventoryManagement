@@ -1,1 +1,13 @@
 <p>sales-list works!</p>
+<div class="sales" *ngIf="sales$ | async as sales">
+  @for (sale of sales; track $index) {
+  <p>Sales Id: {{ sale.salesId }}</p>
+  <p>Item Id: {{ sale.itemId }}</p>
+  <p>Price {{ sale.price }}</p>
+  <p>Quantity {{ sale.quantity }}</p>
+  <p>Sales Amount {{ sale.salesAmount }}</p>
+  <p>Sales Date {{ sale.salesDate }}</p>
+  <p>Inserted Date {{ sale.insertedDate }}</p>
+  <br />
+  }
+</div>
