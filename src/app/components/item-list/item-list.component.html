@@ -1,1 +1,10 @@
 <p>item-list works!</p>
+<div class="items" *ngIf="items$ | async as items">
+  @for (item of items; track $index) {
+  <p>Item Id: {{ item.itemId }}</p>
+  <p>Category Id: {{ item.categoryId }}</p>
+  <p>Item Name: {{ item.name }}</p>
+  <p>Is Available ? {{ item.active }}</p>
+  <br />
+  }
+</div>
