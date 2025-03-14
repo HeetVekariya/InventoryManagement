@@ -1,1 +1,8 @@
 <p>category-list works!</p>
+<div class="categories" *ngIf="categories$ | async as categories">
+  @for (category of categories; track $index) {
+  <p>Category Id: {{ category.categoryId }}</p>
+  <p>Category Name: {{ category.name }}</p>
+  <p>Is Available ? {{ category.active }}</p>
+  }
+</div>
