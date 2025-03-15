@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable, Subject, tap } from 'rxjs';
+import { delay, Observable, Subject, tap } from 'rxjs';
 import { item } from '../models/item';
 import { environment } from '../../environments/environment';
 
@@ -13,8 +13,9 @@ export class ItemService {
   itemsObject = this.itemsSubject.asObservable();
 
   getItems(): Observable<item[]> {
-    return this.http
-      .get<Array<item>>(`${environment.apiUrl}/items`)
-      .pipe(tap((items) => console.log(items)));
+    return this.http.get<Array<item>>(`${environment.apiUrl}/items`).pipe(
+      tap((items) => console.log(items)),
+      delay(2000)
+    );
   }
 }

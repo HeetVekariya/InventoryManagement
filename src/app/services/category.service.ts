@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, Subject, tap } from 'rxjs';
+import { delay, Observable, Subject, tap } from 'rxjs';
 import { category } from '../models/category';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
@@ -17,6 +17,9 @@ export class CategoryService {
 
     return this.http
       .get<Array<category>>(`${environment.apiUrl}/categories`)
-      .pipe(tap((categories) => console.log(categories)));
+      .pipe(
+        tap((categories) => console.log(categories)),
+        delay(2000)
+      );
   }
 }

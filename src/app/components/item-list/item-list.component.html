@@ -1,11 +1,19 @@
 <app-header></app-header>
 <p>item-list works!</p>
-<div class="items" *ngIf="items$ | async as items">
-  @for (item of items; track $index) {
-  <p>Item Id: {{ item.itemId }}</p>
-  <p>Category Id: {{ item.categoryId }}</p>
-  <p>Item Name: {{ item.name }}</p>
-  <p>Is Available ? {{ item.active }}</p>
-  <br />
-  }
+<div *ngIf="items$ | async as items; else loading">
+  <div class="items">
+    <ng-container *ngFor="let item of items">
+      <p>Item Id: {{ item.itemId }}</p>
+      <p>Category Id: {{ item.categoryId }}</p>
+      <p>Item Name: {{ item.name }}</p>
+      <p>Is Available ? {{ item.active }}</p>
+      <br />
+    </ng-container>
+  </div>
 </div>
+
+<ng-template #loading>
+  <div class="loading-container">
+    <img src="loading.gif" alt="Loading..." />
+  </div>
+</ng-template>
