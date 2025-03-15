@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import {
   ActivatedRouteSnapshot,
   CanActivate,
+  Router,
   RouterStateSnapshot,
 } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
@@ -23,8 +23,17 @@ export class AuthGuardService implements CanActivate {
       take(1),
       map((isAuthenticated) => {
         if (isAuthenticated) {
+          if (state.url === '/') {
+            this.router.navigate(['/home']);
+            return false;
+          }
+
           return true;
         } else {
+          if (state.url === '/') {
+            return true;
+          }
+
           this.router.navigate(['/']);
           return false;
         }

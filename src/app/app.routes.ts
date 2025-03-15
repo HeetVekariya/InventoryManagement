@@ -9,6 +9,7 @@ export const routes: Routes = [
         (c) => c.LandingPageComponent
       );
     },
+    canActivate: [AuthGuardService],
   },
   {
     path: 'home',
