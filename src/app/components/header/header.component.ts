@@ -1,6 +1,6 @@
 import { CommonModule, NgIf } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 
 @Component({
@@ -11,4 +11,17 @@ import { AuthService } from '@auth0/auth0-angular';
 })
 export class HeaderComponent {
   authService = inject(AuthService);
+  route = inject(Router);
+
+  isDataRoute(): boolean {
+    if (
+      this.route.url === '/categories' ||
+      this.route.url === '/items' ||
+      this.route.url === '/sales'
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
