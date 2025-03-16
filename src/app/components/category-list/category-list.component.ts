@@ -14,7 +14,7 @@ export class CategoryListComponent {
   categoryService = inject(CategoryService);
   popupFormService = inject(PopupFormService);
 
-  categories$ = this.categoryService.getCategories();
+  categories$ = this.categoryService.categoriesWithAdd$;
 
   addCategory() {
     this.popupFormService.openDialogBox();

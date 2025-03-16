@@ -1,7 +1,17 @@
 import { inject, Injectable } from '@angular/core';
-import { delay, Observable, Subject, tap } from 'rxjs';
+import {
+  catchError,
+  delay,
+  map,
+  merge,
+  scan,
+  Subject,
+  tap,
+  timeout,
+  TimeoutError,
+} from 'rxjs';
 import { category } from '../models/category';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -9,17 +19,56 @@ import { environment } from '../../environments/environment';
 })
 export class CategoryService {
   http = inject(HttpClient);
-  categoriesSubject = new Subject<category>();
-  categoriesObject = this.categoriesSubject.asObservable();
+  private categoryAddSubject = new Subject<category>();
+  categoryAddAction$ = this.categoryAddSubject.asObservable();
 
-  getCategories(): Observable<category[]> {
-    console.log(`${environment.apiUrl}/categories`);
+  categories$ = this.http
+    .get<Array<category>>(`${environment.apiUrl}/categories`)
+    .pipe(
+      timeout(2000),
+      tap((categories) => console.log(categories)),
+      delay(2000),
+      catchError((err) => {
+        console.log((err as TimeoutError).name);
+        return [];
+      })
+    );
 
-    return this.http
-      .get<Array<category>>(`${environment.apiUrl}/categories`)
+  categoriesWithAdd$ = merge(this.categories$, this.categoryAddAction$).pipe(
+    scan(
+      (acc, value) => (value instanceof Array ? [...value] : [...acc, value]),
+      [] as category[]
+    )
+  );
+
+  postCategory(newCategory: { name: string; active: boolean }) {
+    this.http
+      .post(`${environment.apiUrl}/categories`, newCategory)
       .pipe(
-        tap((categories) => console.log(categories)),
-        delay(2000)
-      );
+        timeout(3000),
+        tap((res) => console.log(res)),
+        map((res) => {
+          return {
+            categoryId: (res as { id: number }).id,
+            name: newCategory.name,
+            active: newCategory.active,
+          } as category;
+        }),
+
+        catchError((err) => {
+          if (err instanceof TimeoutError) {
+            console.log({ message: 'Server error' });
+          } else {
+            console.log((err as HttpErrorResponse).error);
+          }
+          return [];
+        })
+      )
+      .subscribe((createdCategory) => {
+        if (createdCategory) {
+          this.categoryAddSubject.next(createdCategory);
+        }
+      });
+    console.log('request completed');
   }
 }

@@ -7,6 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { NgIf } from '@angular/common';
+import { CategoryService } from '../../services/category.service';
 
 @Component({
   selector: 'app-popup-form',
@@ -16,6 +17,8 @@ import { NgIf } from '@angular/common';
 })
 export class PopupFormComponent {
   popupFormService = inject(PopupFormService);
+  categoryService = inject(CategoryService);
+
   categoryForm = new FormGroup({
     categoryName: new FormControl('', [
       Validators.required,
@@ -31,10 +34,13 @@ export class PopupFormComponent {
   onSubmit() {
     if (this.categoryForm.valid) {
       let newCategory = {
-        categoryName: this.categoryForm.controls.categoryName.value,
-        isActive: this.categoryForm.controls.isAvailable.value === 'true',
+        name: this.categoryForm.controls.categoryName.value
+          ? this.categoryForm.controls.categoryName.value
+          : '',
+        active: this.categoryForm.controls.isAvailable.value === 'true',
       };
       console.log('Form Submitted !', newCategory);
+      this.categoryService.postCategory(newCategory);
     }
     this.closeDialogBox();
   }
