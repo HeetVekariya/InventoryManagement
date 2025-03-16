@@ -1,5 +1,6 @@
 <app-header></app-header>
 <p>category-list works!</p>
+<button (click)="addCategory()">Add Category</button>
 <div *ngIf="categories$ | async as categories; else loading">
   <div class="categories">
     <ng-container *ngFor="let category of categories">

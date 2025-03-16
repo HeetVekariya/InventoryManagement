@@ -1,0 +1,58 @@
+<div class="dialog-box">
+  <h3>Popup Dialog</h3>
+  <div class="input-data">
+    <form [formGroup]="categoryForm">
+      <div class="category-name-input">
+        <label for="category-name">Category Name :</label>
+        <input id="category-name" type="text" formControlName="categoryName" />
+        <div
+          *ngIf="
+            categoryForm.get('categoryName')?.invalid &&
+            categoryForm.get('categoryName')?.touched
+          "
+        >
+          <div *ngIf="categoryForm.get('categoryName')?.hasError('required')">
+            Categpry Name is required.
+          </div>
+          <div *ngIf="categoryForm.get('categoryName')?.hasError('minlength')">
+            Category Name must be at least 3 characters long.
+          </div>
+        </div>
+      </div>
+
+      <br />
+
+      <div class="is-available-input">
+        <label for="is-available">Is Available ?</label>
+        <select
+          name="is-available"
+          id="is-available"
+          formControlName="isAvailable"
+        >
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </select>
+        <div
+          *ngIf="
+            categoryForm.get('isAvailable')?.invalid &&
+            categoryForm.get('isAvailable')?.touched
+          "
+        >
+          <div *ngIf="categoryForm.get('isAvailable')?.hasError('required')">
+            Availability is required.
+          </div>
+        </div>
+      </div>
+      <div class="form-operation">
+        <button
+          type="submit"
+          [disabled]="categoryForm.invalid"
+          (click)="onSubmit()"
+        >
+          Submit
+        </button>
+        <button (click)="closeDialogBox()">Close</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CategoryService } from '../../services/category.service';
 import { CommonModule, NgIf } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
+import { PopupFormService } from '../../services/popup-form.service';
 
 @Component({
   selector: 'app-category-list',
@@ -11,6 +12,11 @@ import { HeaderComponent } from '../header/header.component';
 })
 export class CategoryListComponent {
   categoryService = inject(CategoryService);
+  popupFormService = inject(PopupFormService);
 
   categories$ = this.categoryService.getCategories();
+
+  addCategory() {
+    this.popupFormService.openDialogBox();
+  }
 }
