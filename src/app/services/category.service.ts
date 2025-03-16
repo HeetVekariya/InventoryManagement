@@ -10,7 +10,7 @@ import {
   timeout,
   TimeoutError,
 } from 'rxjs';
-import { category } from '../models/category';
+import { Category } from '../models/category';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
@@ -19,11 +19,11 @@ import { environment } from '../../environments/environment';
 })
 export class CategoryService {
   http = inject(HttpClient);
-  private categoryAddSubject = new Subject<category>();
+  private categoryAddSubject = new Subject<Category>();
   categoryAddAction$ = this.categoryAddSubject.asObservable();
 
   categories$ = this.http
-    .get<Array<category>>(`${environment.apiUrl}/categories`)
+    .get<Array<Category>>(`${environment.apiUrl}/categories`)
     .pipe(
       timeout(2000),
       tap((categories) => console.log(categories)),
@@ -37,7 +37,7 @@ export class CategoryService {
   categoriesWithAdd$ = merge(this.categories$, this.categoryAddAction$).pipe(
     scan(
       (acc, value) => (value instanceof Array ? [...value] : [...acc, value]),
-      [] as category[]
+      [] as Category[]
     )
   );
 
@@ -52,7 +52,7 @@ export class CategoryService {
             categoryId: (res as { id: number }).id,
             name: newCategory.name,
             active: newCategory.active,
-          } as category;
+          } as Category;
         }),
 
         catchError((err) => {
