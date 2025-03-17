@@ -4,14 +4,20 @@ import {
   delay,
   map,
   merge,
+  of,
   scan,
   Subject,
   tap,
   timeout,
   TimeoutError,
+  withLatestFrom,
 } from 'rxjs';
 import { Category } from '../models/category';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpParams,
+} from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -19,20 +25,29 @@ import { environment } from '../../environments/environment';
 })
 export class CategoryService {
   http = inject(HttpClient);
+  private categoriesSubject = new Subject<Category[]>();
+  categories$ = this.categoriesSubject.asObservable();
   private categoryAddSubject = new Subject<Category>();
   categoryAddAction$ = this.categoryAddSubject.asObservable();
+  private categoryUpdateSubject = new Subject<Category>();
+  categoryUpdateAction$ = this.categoryUpdateSubject.asObservable();
 
-  categories$ = this.http
-    .get<Array<Category>>(`${environment.apiUrl}/categories`)
-    .pipe(
-      timeout(2000),
-      tap((categories) => console.log(categories)),
-      delay(2000),
-      catchError((err) => {
-        console.log((err as TimeoutError).name);
-        return [];
-      })
-    );
+  getCategories() {
+    return this.http
+      .get<Array<Category>>(`${environment.apiUrl}/categories`)
+      .pipe(
+        timeout(2000),
+        tap((categories) => {
+          this.categoriesSubject.next(categories);
+        }),
+        delay(2000),
+        catchError((err) => {
+          console.log((err as TimeoutError).name);
+          this.categoriesSubject.next([]);
+          return [];
+        })
+      );
+  }
 
   categoriesWithAdd$ = merge(this.categories$, this.categoryAddAction$).pipe(
     scan(
@@ -41,12 +56,34 @@ export class CategoryService {
     )
   );
 
+  categoriesWithUpdate$ = this.categoryUpdateAction$.pipe(
+    withLatestFrom(this.categories$),
+    map(([updatedCategory, categories]) => {
+      if (updatedCategory) {
+        const updatedCategoryIndex = categories.findIndex(
+          (c) => c.categoryId === updatedCategory.categoryId
+        );
+
+        if (updatedCategoryIndex !== -1) {
+          const updatedCategories = [
+            ...categories.slice(0, updatedCategoryIndex),
+            updatedCategory,
+            ...categories.slice(updatedCategoryIndex + 1),
+          ];
+          this.categoriesSubject.next(updatedCategories);
+
+          return updatedCategories;
+        }
+      }
+      return categories;
+    })
+  );
+
   postCategory(newCategory: { name: string; active: boolean }) {
     this.http
       .post(`${environment.apiUrl}/categories`, newCategory)
       .pipe(
         timeout(3000),
-        tap((res) => console.log(res)),
         map((res) => {
           return {
             categoryId: (res as { id: number }).id,
@@ -54,7 +91,6 @@ export class CategoryService {
             active: newCategory.active,
           } as Category;
         }),
-
         catchError((err) => {
           if (err instanceof TimeoutError) {
             console.log({ message: 'Server error' });
@@ -69,6 +105,30 @@ export class CategoryService {
           this.categoryAddSubject.next(createdCategory);
         }
       });
-    console.log('request completed');
+  }
+
+  updateCategory(category: Category) {
+    this.http
+      .patch(`${environment.apiUrl}/categories`, category, {
+        params: new HttpParams().set('id', category.categoryId),
+      })
+      .pipe(
+        timeout(3000),
+        map(() => category),
+        catchError((err) => {
+          if (err instanceof HttpErrorResponse) {
+            if (err.status !== 204) {
+              console.log('HTTP response err:', err.status);
+              of({ error: 'An error occurred while updating the category.' });
+            }
+          }
+          return of(err);
+        })
+      )
+      .subscribe((categoryOrError) => {
+        if (categoryOrError && !(categoryOrError instanceof Error)) {
+          this.categoryUpdateSubject.next(categoryOrError);
+        }
+      });
   }
 }

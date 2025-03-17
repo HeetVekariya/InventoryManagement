@@ -1,3 +1,4 @@
+import { Category } from './../models/category';
 import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PopupFormComponent } from '../components/popup-form/popup-form.component';
@@ -7,8 +8,19 @@ import { PopupFormComponent } from '../components/popup-form/popup-form.componen
 })
 export class PopupFormService {
   dialogBox = inject(MatDialog);
+  isAddOperation: boolean | undefined;
+  updateCategory: Category | undefined;
 
-  openDialogBox() {
+  addCategoryForm() {
+    this.isAddOperation = true;
+    this.dialogBox.open(PopupFormComponent, {
+      panelClass: 'form-dialog-box',
+    });
+  }
+
+  editCategoryForm(category: Category) {
+    this.isAddOperation = false;
+    this.updateCategory = category;
     this.dialogBox.open(PopupFormComponent, {
       panelClass: 'form-dialog-box',
     });

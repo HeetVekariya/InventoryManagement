@@ -47,7 +47,9 @@
         <button
           type="submit"
           [disabled]="categoryForm.invalid"
-          (click)="onSubmit()"
+          (click)="
+            isAddOperation ? onSubmitAddCategory() : onSubmitEditCategory()
+          "
         >
           Submit
         </button>
