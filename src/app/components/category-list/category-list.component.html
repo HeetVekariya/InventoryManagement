@@ -1,6 +1,8 @@
 <app-header></app-header>
 <p>category-list works!</p>
-<button (click)="addCategory()">Add Category</button>
+<button (click)="addCategory()" [disabled]="disableAddCategory()">
+  Add Category
+</button>
 <div *ngIf="categories$ | async as categories; else loading">
   <table class="categories">
     <thead>
@@ -13,7 +15,7 @@
         <td>{{ category.active }}</td>
         <td>
           <button (click)="editCategory(category)">Edit</button>
-          <button>Delete</button>
+          <button (click)="deleteCategory(category.categoryId)">Delete</button>
         </td>
       </tr>
     </tbody>

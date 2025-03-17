@@ -31,12 +31,14 @@ export class CategoryService {
   categoryAddAction$ = this.categoryAddSubject.asObservable();
   private categoryUpdateSubject = new Subject<Category>();
   categoryUpdateAction$ = this.categoryUpdateSubject.asObservable();
+  private categoryDeleteSubject = new Subject<number>();
+  categoryDeleteAction$ = this.categoryDeleteSubject.asObservable();
 
   getCategories() {
     return this.http
       .get<Array<Category>>(`${environment.apiUrl}/categories`)
       .pipe(
-        timeout(2000),
+        timeout(3000),
         tap((categories) => {
           this.categoriesSubject.next(categories);
         }),
@@ -50,10 +52,15 @@ export class CategoryService {
   }
 
   categoriesWithAdd$ = merge(this.categories$, this.categoryAddAction$).pipe(
-    scan(
-      (acc, value) => (value instanceof Array ? [...value] : [...acc, value]),
-      [] as Category[]
-    )
+    scan((acc, value) => {
+      if (value instanceof Array) {
+        return [...value];
+      } else {
+        const categories = [...acc, value];
+        this.categoriesSubject.next(categories);
+        return categories;
+      }
+    }, [] as Category[])
   );
 
   categoriesWithUpdate$ = this.categoryUpdateAction$.pipe(
@@ -70,13 +77,23 @@ export class CategoryService {
             updatedCategory,
             ...categories.slice(updatedCategoryIndex + 1),
           ];
-          this.categoriesSubject.next(updatedCategories);
 
+          this.categoriesSubject.next(updatedCategories);
           return updatedCategories;
         }
       }
       return categories;
     })
+  );
+
+  categoriesWithDelete$ = this.categoryDeleteAction$.pipe(
+    withLatestFrom(this.categories$),
+    map(([id, categories]) => {
+      const reducedCategories = categories.filter((c) => c.categoryId !== id);
+      this.categoriesSubject.next(reducedCategories);
+      return reducedCategories;
+    }),
+    tap((categories) => console.log(categories.length))
   );
 
   postCategory(newCategory: { name: string; active: boolean }) {
@@ -128,6 +145,27 @@ export class CategoryService {
       .subscribe((categoryOrError) => {
         if (categoryOrError && !(categoryOrError instanceof Error)) {
           this.categoryUpdateSubject.next(categoryOrError);
+        }
+      });
+  }
+
+  deleteCategory(id: number) {
+    this.http
+      .delete(`${environment.apiUrl}/categories/${id}`)
+      .pipe(
+        timeout(3000),
+        catchError((err) => {
+          if (err instanceof HttpErrorResponse) {
+            console.log('HTTP response err:', err.status);
+            of({ error: 'An error occurred while deleting the category.' });
+          }
+          return of(err);
+        })
+      )
+      .subscribe((res) => {
+        if (!(res instanceof Error)) {
+          console.log(res);
+          this.categoryDeleteSubject.next(id);
         }
       });
   }
