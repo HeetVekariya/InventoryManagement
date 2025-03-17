@@ -1,14 +1,25 @@
 <app-header></app-header>
 <p>category-list works!</p>
+<button (click)="addCategory()" [disabled]="disableAddCategory()">
+  Add Category
+</button>
 <div *ngIf="categories$ | async as categories; else loading">
-  <div class="categories">
-    <ng-container *ngFor="let category of categories">
-      <p>Category Id: {{ category.categoryId }}</p>
-      <p>Category Name: {{ category.name }}</p>
-      <p>Is Available? {{ category.active }}</p>
-      <br />
-    </ng-container>
-  </div>
+  <table class="categories">
+    <thead>
+      <th>Category Name</th>
+      <th>Is Available</th>
+    </thead>
+    <tbody *ngFor="let category of categories">
+      <tr>
+        <td>{{ category.name }}</td>
+        <td>{{ category.active }}</td>
+        <td>
+          <button (click)="editCategory(category)">Edit</button>
+          <button (click)="deleteCategory(category.categoryId)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 <ng-template #loading>

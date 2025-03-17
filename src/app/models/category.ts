@@ -1,5 +1,5 @@
-export type category = {
-    categoryId: number,
-    name: string,
-    active: boolean
-}
+export type Category = {
+  categoryId: number;
+  name: string;
+  active: boolean;
+};
