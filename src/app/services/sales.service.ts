@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { delay, Observable, Subject, tap } from 'rxjs';
-import { sales } from '../models/sales';
+import { Sales } from '../models/sales';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -9,11 +9,11 @@ import { environment } from '../../environments/environment';
 })
 export class SalesService {
   http = inject(HttpClient);
-  salesSubject = new Subject<sales>();
+  salesSubject = new Subject<Sales>();
   salesObject = this.salesSubject.asObservable();
 
-  getSales(): Observable<sales[]> {
-    return this.http.get<Array<sales>>(`${environment.apiUrl}/sales`).pipe(
+  getSales(): Observable<Sales[]> {
+    return this.http.get<Array<Sales>>(`${environment.apiUrl}/sales`).pipe(
       tap((sales) => console.log(sales)),
       delay(2000)
     );
