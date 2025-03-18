@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ItemService } from '../../services/item.service';
 import { CommonModule, NgIf } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
@@ -9,8 +9,11 @@ import { HeaderComponent } from '../header/header.component';
   templateUrl: './item-list.component.html',
   styleUrl: './item-list.component.css',
 })
-export class ItemListComponent {
+export class ItemListComponent implements OnInit {
   itemService = inject(ItemService);
 
-  items$ = this.itemService.getItems();
+  ngOnInit(): void {
+    this.itemService.getItems().subscribe();
+  }
+  items$ = this.itemService.itemsWithCategories$;
 }
