@@ -4,6 +4,7 @@ import { CommonModule, NgIf } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs';
+import { ModifyItemsService } from '../../services/modify-items.service';
 
 @Component({
   selector: 'app-item-list',
@@ -16,6 +17,7 @@ export class ItemListComponent implements OnInit {
   router = inject(Router);
   route = inject(ActivatedRoute);
   disableAddItem = signal(true);
+  modifyItemService = inject(ModifyItemsService);
 
   ngOnInit(): void {
     this.itemService.getItems().subscribe();
@@ -26,6 +28,18 @@ export class ItemListComponent implements OnInit {
   );
 
   redirectToAddPage() {
+    this.modifyItemService.addItem();
     this.router.navigate(['add'], { relativeTo: this.route });
+  }
+
+  redirectToEditPage(item: {
+    category: string | undefined;
+    itemId: number;
+    categoryId: number;
+    name: string;
+    active: boolean;
+  }) {
+    this.modifyItemService.editItem(item);
+    this.router.navigate(['edit'], { relativeTo: this.route });
   }
 }

@@ -1,6 +1,6 @@
 <app-header></app-header>
 <p>modify-items works!</p>
-<button (click)="goToPreviousPage()">Go Back</button>
+<button (click)="goToItemsPage()">Go Back</button>
 <form [formGroup]="itemForm">
   <div class="item-name-input">
     <label for="item-name">Item Name :</label>
@@ -24,7 +24,7 @@
     <select
       name="category-name"
       id="category-name"
-      formControlName="categoryName"
+      formControlName="categoryId"
     >
       <option
         *ngFor="let category of categories$ | async"
@@ -67,10 +67,10 @@
     <button
       type="submit"
       [disabled]="itemForm.invalid"
-      (click)="onSubmitAddItem()"
+      (click)="isAddOperation ? onSubmitAddItem() : onSubmitEditItem()"
     >
       Submit
     </button>
-    <button (click)="goToPreviousPage()">Cancle</button>
+    <button (click)="goToItemsPage()">Cancle</button>
   </div>
 </form>

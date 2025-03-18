@@ -1,11 +1,16 @@
 import { Item } from './../models/item';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpParams,
+} from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import {
   catchError,
   combineLatest,
   delay,
   map,
+  of,
   Subject,
   tap,
   timeout,
@@ -14,17 +19,21 @@ import {
 } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CategoryService } from './category.service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ItemService {
   http = inject(HttpClient);
+  router = inject(Router);
   categoryService = inject(CategoryService);
   private itemsSubject = new Subject<Item[]>();
   items$ = this.itemsSubject.asObservable();
   private itemAddSubject = new Subject<Item>();
   itemAddAction$ = this.itemAddSubject.asObservable();
+  private itemUpdateSubject = new Subject<Item>();
+  itemUpdateAction$ = this.itemUpdateSubject.asObservable();
 
   itemsWithCategories$ = combineLatest([
     this.categoryService.categories$,
@@ -53,6 +62,29 @@ export class ItemService {
         this.itemsSubject.next(itemsWithAdd);
       }
     });
+
+  itemWithUpdate$ = this.itemUpdateAction$.pipe(
+    withLatestFrom(this.items$),
+    map(([updatedItem, items]) => {
+      if (updatedItem) {
+        const updateItemIndex = items.findIndex(
+          (i) => i.itemId === updatedItem.itemId
+        );
+
+        if (updateItemIndex !== -1) {
+          const updatedItems = [
+            ...items.slice(0, updateItemIndex),
+            updatedItem,
+            ...items.slice(updateItemIndex + 1),
+          ];
+
+          this.itemsSubject.next(updatedItems);
+          return updatedItems;
+        }
+      }
+      return items;
+    })
+  );
 
   getItems() {
     this.categoryService.getCategories().subscribe();
@@ -94,6 +126,32 @@ export class ItemService {
       .subscribe((createdItem) => {
         if (createdItem) {
           this.itemAddSubject.next(createdItem);
+        }
+      });
+  }
+
+  updateItem(item: Item) {
+    this.http
+      .patch(`${environment.apiUrl}/items`, item, {
+        params: new HttpParams().set('id', item.itemId),
+      })
+      .pipe(
+        timeout(3000),
+        map(() => item),
+        catchError((err) => {
+          if (err instanceof HttpErrorResponse) {
+            if (err.status !== 204) {
+              console.log('HTTP response err:', err.status);
+              of({ error: 'An error occurred while updating the category.' });
+            }
+          }
+          return of(err);
+        })
+      )
+      .subscribe((itemOrError) => {
+        if (itemOrError && !(itemOrError instanceof Error)) {
+          this.itemUpdateSubject.next(itemOrError);
+          this.router.navigate(['items']);
         }
       });
   }
