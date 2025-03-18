@@ -1,5 +1,8 @@
 <app-header></app-header>
 <p>item-list works!</p>
+<button [disabled]="disableAddItem()" (click)="redirectToAddPage()">
+  Add Item
+</button>
 <div *ngIf="items$ | async as items; else loading">
   <table class="items">
     <thead>

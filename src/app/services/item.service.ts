@@ -1,16 +1,16 @@
 import { Item } from './../models/item';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import {
   catchError,
   combineLatest,
   delay,
   map,
-  Observable,
   Subject,
   tap,
   timeout,
   TimeoutError,
+  withLatestFrom,
 } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CategoryService } from './category.service';
@@ -21,8 +21,10 @@ import { CategoryService } from './category.service';
 export class ItemService {
   http = inject(HttpClient);
   categoryService = inject(CategoryService);
-  itemsSubject = new Subject<Item[]>();
+  private itemsSubject = new Subject<Item[]>();
   items$ = this.itemsSubject.asObservable();
+  private itemAddSubject = new Subject<Item>();
+  itemAddAction$ = this.itemAddSubject.asObservable();
 
   itemsWithCategories$ = combineLatest([
     this.categoryService.categories$,
@@ -39,6 +41,19 @@ export class ItemService {
     })
   );
 
+  itemsWithAdd$ = this.itemAddAction$
+    .pipe(
+      withLatestFrom(this.items$),
+      map(([newItem, items]) => {
+        return [...items, newItem] as Item[];
+      })
+    )
+    .subscribe((itemsWithAdd) => {
+      if (itemsWithAdd) {
+        this.itemsSubject.next(itemsWithAdd);
+      }
+    });
+
   getItems() {
     this.categoryService.getCategories().subscribe();
     return this.http.get<Array<Item>>(`${environment.apiUrl}/items`).pipe(
@@ -54,5 +69,32 @@ export class ItemService {
         return [];
       })
     );
+  }
+
+  postItem(newItem: { categoryId: number; name: string; active: boolean }) {
+    this.http
+      .post(`${environment.apiUrl}/items`, newItem)
+      .pipe(
+        timeout(3000),
+        map((res) => {
+          return {
+            itemId: (res as { id: number }).id,
+            ...newItem,
+          } as Item;
+        }),
+        catchError((err) => {
+          if (err instanceof TimeoutError) {
+            console.log({ message: 'Server error' });
+          } else {
+            console.log((err as HttpErrorResponse).message);
+          }
+          return [];
+        })
+      )
+      .subscribe((createdItem) => {
+        if (createdItem) {
+          this.itemAddSubject.next(createdItem);
+        }
+      });
   }
 }
