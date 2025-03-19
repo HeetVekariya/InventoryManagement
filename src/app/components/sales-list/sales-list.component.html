@@ -1,5 +1,8 @@
 <app-header></app-header>
 <p>sales-list works!</p>
+<button [disabled]="disableAddSale()" (click)="redirectToAddPage()">
+  Add Sale
+</button>
 <div *ngIf="sales$ | async as sales; else loading">
   <table class="sales">
     <thead>
