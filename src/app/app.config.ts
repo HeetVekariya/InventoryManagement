@@ -15,6 +15,12 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
-    provideAuth0(environment.auth),
+    provideAuth0({
+      ...environment.auth,
+      authorizationParams: {
+        redirect_uri:
+          typeof window !== 'undefined' ? window.location.origin : '',
+      },
+    }),
   ],
 };

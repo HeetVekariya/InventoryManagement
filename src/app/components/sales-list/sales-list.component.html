@@ -1,18 +1,33 @@
 <app-header></app-header>
 <p>sales-list works!</p>
+<button [disabled]="disableAddSale()" (click)="redirectToAddPage()">
+  Add Sale
+</button>
 <div *ngIf="sales$ | async as sales; else loading">
-  <div class="sales">
-    <ng-container *ngFor="let sale of sales">
-      <p>Sales Id: {{ sale.salesId }}</p>
-      <p>Item Id: {{ sale.itemId }}</p>
-      <p>Price {{ sale.price }}</p>
-      <p>Quantity {{ sale.quantity }}</p>
-      <p>Sales Amount {{ sale.salesAmount }}</p>
-      <p>Sales Date {{ sale.salesDate }}</p>
-      <p>Inserted Date {{ sale.insertedDate }}</p>
-      <br />
-    </ng-container>
-  </div>
+  <table class="sales">
+    <thead>
+      <th>Sales Id</th>
+      <th>Item</th>
+      <th>Price</th>
+      <th>Quantity</th>
+      <th>Sales Amount</th>
+      <th>Sales Date</th>
+    </thead>
+    <tbody *ngFor="let sale of sales">
+      <tr>
+        <td>{{ sale.salesId }}</td>
+        <td>{{ sale.item }}</td>
+        <td>{{ sale.price }}</td>
+        <td>{{ sale.quantity }}</td>
+        <td>{{ sale.salesAmount }}</td>
+        <td>{{ sale.salesDate | date : 'longDate' }}</td>
+        <td>
+          <button (click)="redirectToEditPage(sale)">Edit</button>
+          <button (click)="deleteSales(sale.salesId)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 <ng-template #loading>
