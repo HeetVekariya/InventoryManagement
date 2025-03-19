@@ -1,0 +1,76 @@
+<app-header></app-header>
+<p>modify-items works!</p>
+<button (click)="goToItemsPage()">Go Back</button>
+<form [formGroup]="itemForm">
+  <div class="item-name-input">
+    <label for="item-name">Item Name :</label>
+    <input id="item-name" type="text" formControlName="itemName" />
+    <div
+      *ngIf="
+        itemForm.get('itemName')?.invalid && itemForm.get('itemName')?.touched
+      "
+    >
+      <div *ngIf="itemForm.get('itemName')?.hasError('required')">
+        Item Name is required.
+      </div>
+      <div *ngIf="itemForm.get('itemName')?.hasError('minlength')">
+        Item Name must be at least 3 characters long.
+      </div>
+    </div>
+  </div>
+
+  <div class="category-name-input">
+    <label for="category-name">Category Name :</label>
+    <select
+      name="category-name"
+      id="category-name"
+      formControlName="categoryId"
+    >
+      <option
+        *ngFor="let category of categories$ | async"
+        [value]="category.categoryId"
+      >
+        {{ category.name }}
+      </option>
+    </select>
+    <div
+      *ngIf="
+        itemForm.get('categoryName')?.invalid &&
+        itemForm.get('categoryName')?.touched
+      "
+    >
+      <div *ngIf="itemForm.get('categoryName')?.hasError('required')">
+        Category is required.
+      </div>
+    </div>
+  </div>
+
+  <div class="is-available-input">
+    <label for="is-available">Is Available ?</label>
+    <select name="is-available" id="is-available" formControlName="isAvailable">
+      <option value="true">True</option>
+      <option value="false">False</option>
+    </select>
+    <div
+      *ngIf="
+        itemForm.get('isAvailable')?.invalid &&
+        itemForm.get('isAvailable')?.touched
+      "
+    >
+      <div *ngIf="itemForm.get('isAvailable')?.hasError('required')">
+        Availability is required.
+      </div>
+    </div>
+  </div>
+
+  <div class="form-operation">
+    <button
+      type="submit"
+      [disabled]="itemForm.invalid"
+      (click)="isAddOperation ? onSubmitAddItem() : onSubmitEditItem()"
+    >
+      Submit
+    </button>
+    <button (click)="goToItemsPage()">Cancle</button>
+  </div>
+</form>

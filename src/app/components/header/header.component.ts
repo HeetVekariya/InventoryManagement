@@ -11,13 +11,13 @@ import { AuthService } from '@auth0/auth0-angular';
 })
 export class HeaderComponent {
   authService = inject(AuthService);
-  route = inject(Router);
+  router = inject(Router);
 
   isDataRoute(): boolean {
     if (
-      this.route.url === '/categories' ||
-      this.route.url === '/items' ||
-      this.route.url === '/sales'
+      this.router.url === '/categories' ||
+      this.router.url === '/items' ||
+      this.router.url === '/sales'
     ) {
       return true;
     } else {

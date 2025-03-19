@@ -1,15 +1,27 @@
 <app-header></app-header>
 <p>item-list works!</p>
+<button [disabled]="disableAddItem()" (click)="redirectToAddPage()">
+  Add Item
+</button>
 <div *ngIf="items$ | async as items; else loading">
-  <div class="items">
-    <ng-container *ngFor="let item of items">
-      <p>Item Id: {{ item.itemId }}</p>
-      <p>Category Id: {{ item.categoryId }}</p>
-      <p>Item Name: {{ item.name }}</p>
-      <p>Is Available ? {{ item.active }}</p>
-      <br />
-    </ng-container>
-  </div>
+  <table class="items">
+    <thead>
+      <th>Item Name</th>
+      <th>Category Name</th>
+      <th>Is Avilable</th>
+    </thead>
+    <tbody *ngFor="let item of items">
+      <tr>
+        <td>{{ item.name }}</td>
+        <td>{{ item.category }}</td>
+        <td>{{ item.active }}</td>
+        <td>
+          <button (click)="redirectToEditPage(item)">Edit</button>
+          <button (click)="deleteItem(item.itemId)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 <ng-template #loading>
