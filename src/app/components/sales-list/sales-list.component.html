@@ -23,7 +23,7 @@
         <td>{{ sale.salesDate | date : 'longDate' }}</td>
         <td>
           <button (click)="redirectToEditPage(sale)">Edit</button>
-          <button>Delete</button>
+          <button (click)="deleteSales(sale.salesId)">Delete</button>
         </td>
       </tr>
     </tbody>

@@ -34,6 +34,8 @@ export class SalesService {
   salesAddAction$ = this.salesAddSubject.asObservable();
   private salesUpdateSubject = new Subject<Sales>();
   salesUpdateAction$ = this.salesUpdateSubject.asObservable();
+  private salesDeleteSubject = new Subject<number>();
+  salesDeleteAction$ = this.salesDeleteSubject.asObservable();
 
   salesWithItems$ = combineLatest([
     this.itemService.itemsWithCategories$,
@@ -84,6 +86,17 @@ export class SalesService {
       return sales;
     })
   );
+
+  salesWithDelete$ = this.salesDeleteAction$
+    .pipe(
+      withLatestFrom(this.sales$),
+      map(([id, sales]) => {
+        const reducedSales = sales.filter((sale) => sale.salesId !== id);
+        this.salesSubject.next(reducedSales);
+        return reducedSales;
+      })
+    )
+    .subscribe();
 
   getSales() {
     this.itemService.getItems().subscribe();
@@ -170,6 +183,26 @@ export class SalesService {
           this.salesUpdateSubject.next(sales);
           this.router.navigate(['sales']);
           console.log('req completed');
+        }
+      });
+  }
+
+  deleteSales(id: number) {
+    this.http
+      .delete(`${environment.apiUrl}/sales/${id}`)
+      .pipe(
+        timeout(3000),
+        catchError((err) => {
+          if (err instanceof HttpErrorResponse) {
+            console.log('HTTP response err:', err.status);
+            of({ error: 'An error occurred while deleting the category.' });
+          }
+          return of(err);
+        })
+      )
+      .subscribe((res) => {
+        if (!(res instanceof Error)) {
+          this.salesDeleteSubject.next(id);
         }
       });
   }

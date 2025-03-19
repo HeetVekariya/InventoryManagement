@@ -45,4 +45,8 @@ export class SalesListComponent implements OnInit {
     this.modifySalesService.editSales(sales);
     this.router.navigate(['edit'], { relativeTo: this.route });
   }
+
+  deleteSales(id: number) {
+    this.salesService.deleteSales(id);
+  }
 }
