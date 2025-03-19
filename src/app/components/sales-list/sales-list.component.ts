@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { SalesService } from '../../services/sales.service';
 import { CommonModule, NgIf } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
+import { tap } from 'rxjs';
 
 @Component({
   selector: 'app-sales-list',
@@ -9,8 +10,12 @@ import { HeaderComponent } from '../header/header.component';
   templateUrl: './sales-list.component.html',
   styleUrl: './sales-list.component.css',
 })
-export class SalesListComponent {
+export class SalesListComponent implements OnInit {
   salesService = inject(SalesService);
 
-  sales$ = this.salesService.getSales();
+  ngOnInit(): void {
+    this.salesService.getSales().subscribe();
+  }
+
+  sales$ = this.salesService.salesWithItems$;
 }
