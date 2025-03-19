@@ -66,7 +66,6 @@ export class ModifyItemsComponent {
       };
 
       this.itemService.postItem(newItem);
-      this.goToItemsPage();
     }
   }
 

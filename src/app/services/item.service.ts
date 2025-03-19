@@ -139,6 +139,7 @@ export class ItemService {
       .subscribe((createdItem) => {
         if (createdItem) {
           this.itemAddSubject.next(createdItem);
+          this.router.navigate(['items']);
         }
       });
   }
