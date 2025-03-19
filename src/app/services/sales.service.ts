@@ -1,17 +1,22 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Sales } from './../models/sales';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpParams,
+} from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import {
   catchError,
   combineLatest,
   delay,
   map,
+  of,
   Subject,
   tap,
   timeout,
   TimeoutError,
   withLatestFrom,
 } from 'rxjs';
-import { Sales } from '../models/sales';
 import { environment } from '../../environments/environment';
 import { ItemService } from './item.service';
 import { Router } from '@angular/router';
@@ -27,6 +32,8 @@ export class SalesService {
   sales$ = this.salesSubject.asObservable();
   private salesAddSubject = new Subject<Sales>();
   salesAddAction$ = this.salesAddSubject.asObservable();
+  private salesUpdateSubject = new Subject<Sales>();
+  salesUpdateAction$ = this.salesUpdateSubject.asObservable();
 
   salesWithItems$ = combineLatest([
     this.itemService.itemsWithCategories$,
@@ -54,6 +61,29 @@ export class SalesService {
         this.salesSubject.next(salesWithAdd);
       }
     });
+
+  salesWithUpdate$ = this.salesUpdateAction$.pipe(
+    withLatestFrom(this.sales$),
+    map(([updatedSale, sales]) => {
+      if (updatedSale) {
+        const updateSalesIndex = sales.findIndex(
+          (sale) => sale.salesId === updatedSale.salesId
+        );
+
+        if (updateSalesIndex !== -1) {
+          const updatedSales = [
+            ...sales.slice(0, updateSalesIndex),
+            updatedSale,
+            ...sales.slice(updateSalesIndex + 1),
+          ];
+
+          this.salesSubject.next(updatedSales);
+          return updatedSales;
+        }
+      }
+      return sales;
+    })
+  );
 
   getSales() {
     this.itemService.getItems().subscribe();
@@ -113,6 +143,33 @@ export class SalesService {
         if (createdSales) {
           this.salesAddSubject.next(createdSales);
           this.router.navigate(['sales']);
+        }
+      });
+  }
+
+  updateSales(sales: Sales) {
+    this.http
+      .patch(`${environment.apiUrl}/sales`, sales, {
+        params: new HttpParams().set('id', sales.salesId),
+      })
+      .pipe(
+        timeout(3000),
+        map(() => sales),
+        catchError((err) => {
+          if (err instanceof HttpErrorResponse) {
+            if (err.status !== 204) {
+              console.log('HTTP response err:', err.status);
+              of({ error: 'An error occurred while updating the category.' });
+            }
+          }
+          return of(err);
+        })
+      )
+      .subscribe((salesOrError) => {
+        if (salesOrError && !(salesOrError instanceof Error)) {
+          this.salesUpdateSubject.next(sales);
+          this.router.navigate(['sales']);
+          console.log('req completed');
         }
       });
   }

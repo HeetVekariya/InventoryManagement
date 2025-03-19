@@ -62,7 +62,7 @@
   </div>
 
   <div class="sales-date-input">
-    <label for="sales-date">Sales Amount :</label>
+    <label for="sales-date">Sales Date :</label>
     <input id="sales-date" type="datetime-local" formControlName="salesDate" />
     <div
       *ngIf="
@@ -80,7 +80,7 @@
     <button
       type="submit"
       [disabled]="salesForm.invalid"
-      (click)="onSubmitAddSales()"
+      (click)="isAddOperation ? onSubmitAddSales() : onSubmitEditSales()"
     >
       Submit
     </button>

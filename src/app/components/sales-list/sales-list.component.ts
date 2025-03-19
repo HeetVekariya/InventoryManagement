@@ -31,4 +31,18 @@ export class SalesListComponent implements OnInit {
     this.modifySalesService.addSales();
     this.router.navigate(['add'], { relativeTo: this.route });
   }
+
+  redirectToEditPage(sales: {
+    salesId: number;
+    item: string | undefined;
+    itemId: number;
+    quantity: number;
+    price: number;
+    salesAmount: number;
+    salesDate: Date;
+    insertedDate: Date;
+  }) {
+    this.modifySalesService.editSales(sales);
+    this.router.navigate(['edit'], { relativeTo: this.route });
+  }
 }
