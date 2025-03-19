@@ -66,6 +66,24 @@ export const routes: Routes = [
     canActivate: [AuthGuardService],
   },
   {
+    path: 'sales/add',
+    loadComponent: () => {
+      return import('./components/modify-sales/modify-sales.component').then(
+        (c) => c.ModifySalesComponent
+      );
+    },
+    canActivate: [AuthGuardService],
+  },
+  {
+    path: 'sales/edit',
+    loadComponent: () => {
+      return import('./components/modify-sales/modify-sales.component').then(
+        (c) => c.ModifySalesComponent
+      );
+    },
+    canActivate: [AuthGuardService],
+  },
+  {
     path: '**',
     loadComponent: () => {
       return import('./components/not-found/not-found.component').then(
