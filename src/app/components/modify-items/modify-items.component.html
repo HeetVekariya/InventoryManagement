@@ -19,13 +19,9 @@
     </div>
   </div>
 
-  <div class="category-name-input">
-    <label for="category-name">Category Name :</label>
-    <select
-      name="category-name"
-      id="category-name"
-      formControlName="categoryId"
-    >
+  <div class="category-id-input">
+    <label for="category-id">Category Name :</label>
+    <select name="category-id" id="category-id" formControlName="categoryId">
       <option
         *ngFor="let category of categories$ | async"
         [value]="category.categoryId"
@@ -35,11 +31,11 @@
     </select>
     <div
       *ngIf="
-        itemForm.get('categoryName')?.invalid &&
-        itemForm.get('categoryName')?.touched
+        itemForm.get('categoryId')?.invalid &&
+        itemForm.get('categoryId')?.touched
       "
     >
-      <div *ngIf="itemForm.get('categoryName')?.hasError('required')">
+      <div *ngIf="itemForm.get('categoryId')?.hasError('required')">
         Category is required.
       </div>
     </div>

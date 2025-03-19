@@ -66,7 +66,6 @@ export class ModifyItemsComponent {
       };
 
       this.itemService.postItem(newItem);
-      this.goToItemsPage();
     }
   }
 
@@ -81,6 +80,7 @@ export class ModifyItemsComponent {
       ) {
         // show alert
         console.log('No changes has been made');
+        this.goToItemsPage();
       } else {
         const updatedItem: Item = {
           itemId: this.updateItem?.itemId ? this.updateItem?.itemId : -1,
