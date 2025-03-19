@@ -34,6 +34,8 @@ export class ItemService {
   itemAddAction$ = this.itemAddSubject.asObservable();
   private itemUpdateSubject = new Subject<Item>();
   itemUpdateAction$ = this.itemUpdateSubject.asObservable();
+  private itemDeleteSubject = new Subject<number>();
+  itemDeleteAction$ = this.itemDeleteSubject.asObservable();
 
   itemsWithCategories$ = combineLatest([
     this.categoryService.categories$,
@@ -85,6 +87,17 @@ export class ItemService {
       return items;
     })
   );
+
+  itemsWithDelete$ = this.itemDeleteAction$
+    .pipe(
+      withLatestFrom(this.items$),
+      map(([id, items]) => {
+        const reducedItems = items.filter((item) => item.itemId !== id);
+        this.itemsSubject.next(reducedItems);
+        return reducedItems;
+      })
+    )
+    .subscribe();
 
   getItems() {
     this.categoryService.getCategories().subscribe();
@@ -152,6 +165,26 @@ export class ItemService {
         if (itemOrError && !(itemOrError instanceof Error)) {
           this.itemUpdateSubject.next(itemOrError);
           this.router.navigate(['items']);
+        }
+      });
+  }
+
+  deleteItem(id: number) {
+    this.http
+      .delete(`${environment.apiUrl}/items/${id}`)
+      .pipe(
+        timeout(3000),
+        catchError((err) => {
+          if (err instanceof HttpErrorResponse) {
+            console.log('HTTP response err:', err.status);
+            of({ error: 'An error occurred while deleting the category.' });
+          }
+          return of(err);
+        })
+      )
+      .subscribe((res) => {
+        if (!(res instanceof Error)) {
+          this.itemDeleteSubject.next(id);
         }
       });
   }

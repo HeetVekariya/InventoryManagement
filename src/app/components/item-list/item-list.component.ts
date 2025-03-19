@@ -42,4 +42,8 @@ export class ItemListComponent implements OnInit {
     this.modifyItemService.editItem(item);
     this.router.navigate(['edit'], { relativeTo: this.route });
   }
+
+  deleteItem(id: number) {
+    this.itemService.deleteItem(id);
+  }
 }

@@ -17,7 +17,7 @@
         <td>{{ item.active }}</td>
         <td>
           <button (click)="redirectToEditPage(item)">Edit</button>
-          <button>Delete</button>
+          <button (click)="deleteItem(item.itemId)">Delete</button>
         </td>
       </tr>
     </tbody>
