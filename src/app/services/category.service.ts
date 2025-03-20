@@ -66,50 +66,57 @@ export class CategoryService {
       );
   }
 
-  categoriesWithAdd$ = merge(this.categories$, this.categoryAddAction$).pipe(
-    scan((acc, value) => {
-      if (value instanceof Array) {
-        return [...value];
-      } else {
-        const categories = [...acc, value];
-        this.categoriesSubject.next(categories);
-        return categories;
+  categoriesWithAdd$ = this.categoryAddAction$
+    .pipe(
+      withLatestFrom(this.categories$),
+      map(([newCategory, categories]) => {
+        return [...categories, newCategory] as Category[];
+      })
+    )
+    .subscribe((categoriesWithAdd) => {
+      if (categoriesWithAdd) {
+        // this.getCategories(true).subscribe();
+        this.categoriesSubject.next(categoriesWithAdd);
       }
-    }, [] as Category[])
-  );
+    });
 
-  categoriesWithUpdate$ = this.categoryUpdateAction$.pipe(
-    withLatestFrom(this.categories$),
-    map(([updatedCategory, categories]) => {
-      if (updatedCategory) {
-        const updatedCategoryIndex = categories.findIndex(
-          (c) => c.categoryId === updatedCategory.categoryId
-        );
+  categoriesWithUpdate$ = this.categoryUpdateAction$
+    .pipe(
+      withLatestFrom(this.categories$),
+      map(([updatedCategory, categories]) => {
+        if (updatedCategory) {
+          const updatedCategoryIndex = categories.findIndex(
+            (c) => c.categoryId === updatedCategory.categoryId
+          );
 
-        if (updatedCategoryIndex !== -1) {
-          const updatedCategories = [
-            ...categories.slice(0, updatedCategoryIndex),
-            updatedCategory,
-            ...categories.slice(updatedCategoryIndex + 1),
-          ];
+          if (updatedCategoryIndex !== -1) {
+            const updatedCategories = [
+              ...categories.slice(0, updatedCategoryIndex),
+              updatedCategory,
+              ...categories.slice(updatedCategoryIndex + 1),
+            ];
 
-          this.categoriesSubject.next(updatedCategories);
-          return updatedCategories;
+            // this.getCategories(true).subscribe();
+            this.categoriesSubject.next(updatedCategories);
+            return updatedCategories;
+          }
         }
-      }
-      return categories;
-    })
-  );
+        return categories;
+      })
+    )
+    .subscribe();
 
-  categoriesWithDelete$ = this.categoryDeleteAction$.pipe(
-    withLatestFrom(this.categories$),
-    map(([id, categories]) => {
-      const reducedCategories = categories.filter((c) => c.categoryId !== id);
-      this.categoriesSubject.next(reducedCategories);
-      return reducedCategories;
-    }),
-    tap((categories) => console.log(categories.length))
-  );
+  categoriesWithDelete$ = this.categoryDeleteAction$
+    .pipe(
+      withLatestFrom(this.categories$),
+      map(([id, categories]) => {
+        const reducedCategories = categories.filter((c) => c.categoryId !== id);
+        this.categoriesSubject.next(reducedCategories);
+        // this.getCategories(true).subscribe();
+        return reducedCategories;
+      })
+    )
+    .subscribe();
 
   postCategory(newCategory: { name: string; active: boolean }) {
     this.http
