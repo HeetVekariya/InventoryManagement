@@ -18,7 +18,7 @@ export class CategoryListComponent implements OnInit {
   categoryService = inject(CategoryService);
   popupFormService = inject(PopupFormService);
   disableAddCategory = signal(true);
-  isActive: boolean | undefined;
+  isActive = '';
   page = 1;
   sortBy = 'categoryId';
   pageSize = '10';
@@ -51,18 +51,16 @@ export class CategoryListComponent implements OnInit {
     let parameters = this.getParameters();
 
     if (this.isActive !== undefined) {
-      parameters.set('isActive', this.isActive);
+      parameters = parameters.set('isActive', this.isActive);
     }
 
     this.categoryService.parameters = parameters;
     this.categoryService.getCategories(true).subscribe();
   }
 
-  categories$ = merge(
-    this.categoryService.categoriesWithAdd$,
-    this.categoryService.categoriesWithUpdate$,
-    this.categoryService.categoriesWithDelete$
-  ).pipe(tap(() => this.disableAddCategory.set(!this.disableAddCategory)));
+  categories$ = this.categoryService.categories$.pipe(
+    tap(() => this.disableAddCategory.set(false))
+  );
 
   addCategory() {
     this.popupFormService.addCategoryForm();
