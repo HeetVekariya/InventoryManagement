@@ -6,11 +6,13 @@
 <div *ngIf="categories$ | async as categories; else loading">
   <table class="categories">
     <thead>
-      <th>Category Name</th>
+      <th (click)="onSort('categoryId')">Category Id</th>
+      <th (click)="onSort('categoryName')">Category Name</th>
       <th>Is Available</th>
     </thead>
     <tbody *ngFor="let category of categories">
       <tr>
+        <td>{{ category.categoryId }}</td>
         <td>{{ category.name }}</td>
         <td>{{ category.active }}</td>
         <td>

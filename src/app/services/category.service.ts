@@ -25,6 +25,7 @@ import { environment } from '../../environments/environment';
 })
 export class CategoryService {
   http = inject(HttpClient);
+  parameters: HttpParams = new HttpParams();
   private categoriesSubject = new Subject<Category[]>();
   categories$ = this.categoriesSubject.asObservable();
   private categoryAddSubject = new Subject<Category>();
@@ -34,13 +35,27 @@ export class CategoryService {
   private categoryDeleteSubject = new Subject<number>();
   categoryDeleteAction$ = this.categoryDeleteSubject.asObservable();
 
-  getCategories() {
+  getCategories(isCalledFromCategoriesList: boolean = false) {
+    console.log(this.parameters);
+
     return this.http
-      .get<Array<Category>>(`${environment.apiUrl}/categories`)
+      .get<{
+        totalRecords: number;
+        totalPages: number;
+        pageNo: number;
+        pageSize: number;
+        categories: Category[];
+      }>(
+        `${environment.apiUrl}/categories`,
+        isCalledFromCategoriesList
+          ? { params: this.parameters }
+          : { params: new HttpParams().set('calledFromCategoryList', false) }
+      )
       .pipe(
         timeout(3000),
-        tap((categories) => {
-          this.categoriesSubject.next(categories);
+        tap((res) => {
+          console.log(res);
+          this.categoriesSubject.next(res.categories);
         }),
         delay(2000),
         catchError((err) => {
