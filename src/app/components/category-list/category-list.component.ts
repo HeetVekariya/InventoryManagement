@@ -6,10 +6,11 @@ import { HeaderComponent } from '../header/header.component';
 import { PopupFormService } from '../../services/popup-form.service';
 import { merge, tap } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-category-list',
-  imports: [NgIf, CommonModule, HeaderComponent],
+  imports: [NgIf, CommonModule, HeaderComponent, FormsModule],
   templateUrl: './category-list.component.html',
   styleUrl: './category-list.component.css',
 })
@@ -20,14 +21,14 @@ export class CategoryListComponent implements OnInit {
   isActive: boolean | undefined;
   page = 1;
   sortBy = 'categoryId';
-  pageSize = 10;
+  pageSize = '10';
   sortOrder = 'asc';
 
   private getParameters(): HttpParams {
     return new HttpParams()
       .set('page', this.page)
       .set('sortBy', this.sortBy)
-      .set('pageSize', this.pageSize)
+      .set('pageSize', Number(this.pageSize))
       .set('sortOrder', this.sortOrder)
       .set('calledFromCategoryList', Boolean(true));
   }
