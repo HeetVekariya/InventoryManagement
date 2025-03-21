@@ -21,12 +21,15 @@ export class ItemListComponent implements OnInit {
   disableAddItem = signal(true);
   modifyItemService = inject(ModifyItemsService);
   isActive = '';
+  page = 1;
   sortBy = 'itemId';
   pageSize = '10';
   sortOrder = 'asc';
+  disableNextPage = signal(false);
 
   private getParameters(): HttpParams {
     return new HttpParams()
+      .set('page', this.page)
       .set('isActive', this.isActive)
       .set('sortBy', this.sortBy)
       .set('pageSize', Number(this.pageSize))
@@ -53,7 +56,30 @@ export class ItemListComponent implements OnInit {
     let parameters = this.getParameters();
 
     this.itemService.parameters = parameters;
-    this.itemService.getItems(true).subscribe();
+    this.itemService
+      .getItems(true)
+      .pipe(
+        tap(() => {
+          this.itemService.itemsResponse?.totalPages
+            ? this.page >= this.itemService.itemsResponse.totalPages
+              ? this.disableNextPage.set(true)
+              : this.disableNextPage.set(false)
+            : null;
+        })
+      )
+      .subscribe();
+  }
+
+  goToPreviousPage() {
+    this.page--;
+    this.filterItems();
+  }
+
+  goToNextPage() {
+    if (!this.disableNextPage()) {
+      this.page++;
+      this.filterItems();
+    }
   }
 
   items$ = this.itemService.itemsWithCategories$.pipe(
