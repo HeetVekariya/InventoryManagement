@@ -22,12 +22,14 @@ export class ItemListComponent implements OnInit {
   modifyItemService = inject(ModifyItemsService);
   isActive = '';
   sortBy = 'itemId';
+  pageSize = '10';
   sortOrder = 'asc';
 
   private getParameters(): HttpParams {
     return new HttpParams()
       .set('isActive', this.isActive)
       .set('sortBy', this.sortBy)
+      .set('pageSize', Number(this.pageSize))
       .set('sortOrder', this.sortOrder)
       .set('calledFromItemList', Boolean(true));
   }
