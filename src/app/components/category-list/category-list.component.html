@@ -12,7 +12,7 @@
       [(ngModel)]="isActive"
       (change)="filterCategories()"
     >
-      <option value="">Select</option>
+      <option value="">All</option>
       <option value="true">True</option>
       <option value="false">False</option>
     </select>
@@ -47,6 +47,27 @@
       <option value="15">15</option>
       <option value="20">20</option>
     </select>
+  </div>
+  <div class="page-number-filter-input">
+    <button
+      name="previous-page"
+      id="previous-page"
+      (click)="goToPreviousPage()"
+      [disabled]="page == 1"
+    >
+      Previous
+    </button>
+    <button name="current-page" id="current-page">
+      {{ page }}
+    </button>
+    <button
+      name="next-page"
+      id="next-page"
+      (click)="goToNextPage()"
+      [disabled]="disableNextPage()"
+    >
+      Next
+    </button>
   </div>
 </div>
 

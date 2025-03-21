@@ -23,6 +23,7 @@ export class CategoryListComponent implements OnInit {
   sortBy = 'categoryId';
   pageSize = '10';
   sortOrder = 'asc';
+  disableNextPage = signal(false);
 
   private getParameters(): HttpParams {
     return new HttpParams()
@@ -55,7 +56,30 @@ export class CategoryListComponent implements OnInit {
     }
 
     this.categoryService.parameters = parameters;
-    this.categoryService.getCategories(true).subscribe();
+    this.categoryService
+      .getCategories(true)
+      .pipe(
+        tap(() => {
+          this.categoryService.categoriesResponse?.totalPages
+            ? this.page >= this.categoryService.categoriesResponse?.totalPages
+              ? this.disableNextPage.set(true)
+              : this.disableNextPage.set(false)
+            : null;
+        })
+      )
+      .subscribe();
+  }
+
+  goToPreviousPage() {
+    this.page--;
+    this.filterCategories();
+  }
+
+  goToNextPage() {
+    if (!this.disableNextPage()) {
+      this.page++;
+      this.filterCategories();
+    }
   }
 
   categories$ = this.categoryService.categories$.pipe(

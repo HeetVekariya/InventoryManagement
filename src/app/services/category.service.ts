@@ -3,9 +3,7 @@ import {
   catchError,
   delay,
   map,
-  merge,
   of,
-  scan,
   Subject,
   tap,
   timeout,
@@ -26,6 +24,15 @@ import { environment } from '../../environments/environment';
 export class CategoryService {
   http = inject(HttpClient);
   parameters: HttpParams = new HttpParams();
+  categoriesResponse:
+    | {
+        totalRecords: number;
+        totalPages: number;
+        pageNo: number;
+        pageSize: number;
+        categories: Category[];
+      }
+    | undefined;
   private categoriesSubject = new Subject<Category[]>();
   categories$ = this.categoriesSubject.asObservable();
   private categoryAddSubject = new Subject<Category>();
@@ -34,37 +41,6 @@ export class CategoryService {
   categoryUpdateAction$ = this.categoryUpdateSubject.asObservable();
   private categoryDeleteSubject = new Subject<number>();
   categoryDeleteAction$ = this.categoryDeleteSubject.asObservable();
-
-  getCategories(isCalledFromCategoriesList: boolean = false) {
-    console.log(this.parameters);
-
-    return this.http
-      .get<{
-        totalRecords: number;
-        totalPages: number;
-        pageNo: number;
-        pageSize: number;
-        categories: Category[];
-      }>(
-        `${environment.apiUrl}/categories`,
-        isCalledFromCategoriesList
-          ? { params: this.parameters }
-          : { params: new HttpParams().set('calledFromCategoryList', false) }
-      )
-      .pipe(
-        timeout(3000),
-        tap((res) => {
-          console.log(res);
-          this.categoriesSubject.next(res.categories);
-        }),
-        delay(2000),
-        catchError((err) => {
-          console.log((err as TimeoutError).name);
-          this.categoriesSubject.next([]);
-          return [];
-        })
-      );
-  }
 
   categoriesWithAdd$ = this.categoryAddAction$
     .pipe(
@@ -117,6 +93,35 @@ export class CategoryService {
       })
     )
     .subscribe();
+
+  getCategories(isCalledFromCategoriesList: boolean = false) {
+    return this.http
+      .get<{
+        totalRecords: number;
+        totalPages: number;
+        pageNo: number;
+        pageSize: number;
+        categories: Category[];
+      }>(
+        `${environment.apiUrl}/categories`,
+        isCalledFromCategoriesList
+          ? { params: this.parameters }
+          : { params: new HttpParams().set('calledFromCategoryList', false) }
+      )
+      .pipe(
+        timeout(3000),
+        tap((res) => {
+          console.log(res);
+          this.categoriesResponse = res;
+          this.categoriesSubject.next(res.categories);
+        }),
+        catchError((err) => {
+          console.log((err as TimeoutError).name);
+          this.categoriesSubject.next([]);
+          return [];
+        })
+      );
+  }
 
   postCategory(newCategory: { name: string; active: boolean }) {
     this.http
