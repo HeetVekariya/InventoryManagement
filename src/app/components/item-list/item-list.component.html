@@ -6,12 +6,14 @@
 <div *ngIf="items$ | async as items; else loading">
   <table class="items">
     <thead>
-      <th>Item Name</th>
-      <th>Category Name</th>
+      <th (click)="onSort('itemId')">Item Id</th>
+      <th (click)="onSort('itemName')">Item Name</th>
+      <th (click)="onSort('categoryName')">Category Name</th>
       <th>Is Avilable</th>
     </thead>
     <tbody *ngFor="let item of items">
       <tr>
+        <td>{{ item.itemId }}</td>
         <td>{{ item.name }}</td>
         <td>{{ item.category }}</td>
         <td>{{ item.active }}</td>

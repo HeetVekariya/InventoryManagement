@@ -8,7 +8,6 @@ import { inject, Injectable } from '@angular/core';
 import {
   catchError,
   combineLatest,
-  delay,
   map,
   of,
   Subject,
@@ -27,6 +26,16 @@ import { Router } from '@angular/router';
 export class ItemService {
   http = inject(HttpClient);
   router = inject(Router);
+  parameters: HttpParams = new HttpParams();
+  itemsResponse:
+    | {
+        totalRecords: number;
+        totalPages: number;
+        pageNo: number;
+        pageSize: number;
+        items: Item[];
+      }
+    | undefined;
   categoryService = inject(CategoryService);
   private itemsSubject = new Subject<Item[]>();
   items$ = this.itemsSubject.asObservable();
@@ -99,21 +108,37 @@ export class ItemService {
     )
     .subscribe();
 
-  getItems() {
+  getItems(isCalledFromItemList: boolean = false) {
+    console.log(this.parameters);
+    console.log(isCalledFromItemList);
+
     this.categoryService.getCategories().subscribe();
-    return this.http.get<Array<Item>>(`${environment.apiUrl}/items`).pipe(
-      timeout(3000),
-      tap((items) => {
-        this.itemsSubject.next(items);
-        console.log(items);
-      }),
-      delay(2000),
-      catchError((err) => {
-        console.log((err as TimeoutError).name);
-        this.itemsSubject.next([]);
-        return [];
-      })
-    );
+    return this.http
+      .get<{
+        totalRecords: number;
+        totalPages: number;
+        pageNo: number;
+        pageSize: number;
+        items: Item[];
+      }>(
+        `${environment.apiUrl}/items`,
+        isCalledFromItemList
+          ? { params: this.parameters }
+          : { params: new HttpParams().set('calledFromItemList', false) }
+      )
+      .pipe(
+        timeout(3000),
+        tap((res) => {
+          console.log(res);
+          this.itemsResponse = res;
+          this.itemsSubject.next(res.items);
+        }),
+        catchError((err) => {
+          console.log((err as TimeoutError).name);
+          this.itemsSubject.next([]);
+          return [];
+        })
+      );
   }
 
   postItem(newItem: { categoryId: number; name: string; active: boolean }) {

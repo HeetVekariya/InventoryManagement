@@ -5,6 +5,7 @@ import { HeaderComponent } from '../header/header.component';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs';
 import { ModifyItemsService } from '../../services/modify-items.service';
+import { HttpParams } from '@angular/common/http';
 
 @Component({
   selector: 'app-item-list',
@@ -18,9 +19,36 @@ export class ItemListComponent implements OnInit {
   route = inject(ActivatedRoute);
   disableAddItem = signal(true);
   modifyItemService = inject(ModifyItemsService);
+  sortBy = 'itemId';
+  sortOrder = 'asc';
+
+  private getParameters(): HttpParams {
+    return new HttpParams()
+      .set('sortBy', this.sortBy)
+      .set('sortOrder', this.sortOrder)
+      .set('calledFromItemList', Boolean(true));
+  }
 
   ngOnInit(): void {
-    this.itemService.getItems().subscribe();
+    this.itemService.parameters = this.getParameters();
+    this.itemService.getItems(true).subscribe();
+  }
+
+  onSort(sortBy: string) {
+    if (this.sortBy === sortBy) {
+      this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortBy = sortBy;
+    }
+
+    this.filterItems();
+  }
+
+  filterItems() {
+    let parameters = this.getParameters();
+
+    this.itemService.parameters = parameters;
+    this.itemService.getItems(true).subscribe();
   }
 
   items$ = this.itemService.itemsWithCategories$.pipe(
