@@ -6,10 +6,11 @@ import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs';
 import { ModifyItemsService } from '../../services/modify-items.service';
 import { HttpParams } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-item-list',
-  imports: [NgIf, CommonModule, HeaderComponent, RouterModule],
+  imports: [NgIf, CommonModule, HeaderComponent, RouterModule, FormsModule],
   templateUrl: './item-list.component.html',
   styleUrl: './item-list.component.css',
 })
@@ -19,11 +20,13 @@ export class ItemListComponent implements OnInit {
   route = inject(ActivatedRoute);
   disableAddItem = signal(true);
   modifyItemService = inject(ModifyItemsService);
+  isActive = '';
   sortBy = 'itemId';
   sortOrder = 'asc';
 
   private getParameters(): HttpParams {
     return new HttpParams()
+      .set('isActive', this.isActive)
       .set('sortBy', this.sortBy)
       .set('sortOrder', this.sortOrder)
       .set('calledFromItemList', Boolean(true));

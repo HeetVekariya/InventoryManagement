@@ -4,6 +4,19 @@
   Add Item
 </button>
 <div *ngIf="items$ | async as items; else loading">
+  <div class="is-available-filter-input">
+    <label for="is-available-filter">Is Available ? : </label>
+    <select
+      name="is-available-filter"
+      id="is-available-filter"
+      [(ngModel)]="isActive"
+      (change)="filterItems()"
+    >
+      <option value="">All</option>
+      <option value="true">True</option>
+      <option value="false">False</option>
+    </select>
+  </div>
   <table class="items">
     <thead>
       <th (click)="onSort('itemId')">Item Id</th>
