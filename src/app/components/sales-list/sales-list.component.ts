@@ -25,6 +25,8 @@ export class SalesListComponent {
   modifySalesService = inject(ModifySalesService);
   disableAddSale = signal(true);
   itemId = -1;
+  startDate: Date | undefined;
+  endDate: Date | undefined;
   page = 1;
   sortBy = 'salesId';
   pageSize = '10';
@@ -58,6 +60,14 @@ export class SalesListComponent {
 
   filterSales() {
     let parameters = this.getParameters();
+
+    if (this.startDate !== undefined) {
+      parameters = parameters.set('startDate', this.startDate.toString());
+    }
+
+    if (this.endDate !== undefined) {
+      parameters = parameters.set('endDate', this.endDate.toString());
+    }
 
     this.salesService.parameters = parameters;
     this.salesService.getSales(true).subscribe();

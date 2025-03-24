@@ -18,6 +18,24 @@
       </option>
     </select>
   </div>
+  <div class="start-date-filter-input">
+    <label for="start-date-filter">From : </label>
+    <input
+      id="start-date-filter"
+      type="date"
+      [(ngModel)]="startDate"
+      (change)="filterSales()"
+    />
+  </div>
+  <div class="end-date-filter-input">
+    <label for="end-date-filter">To : </label>
+    <input
+      id="end-date-filter"
+      type="date"
+      [(ngModel)]="endDate"
+      (change)="filterSales()"
+    />
+  </div>
   <table class="sales">
     <thead>
       <th (click)="onSort('salesId')">Sales Id</th>
