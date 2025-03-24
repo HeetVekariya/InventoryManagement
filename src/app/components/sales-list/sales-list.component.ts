@@ -7,28 +7,33 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ModifySalesService } from '../../services/modify-sales.service';
 import { ItemService } from '../../services/item.service';
 import { HttpParams } from '@angular/common/http';
+import { Item } from '../../models/item';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-sales-list',
-  imports: [NgIf, CommonModule, HeaderComponent],
+  imports: [NgIf, CommonModule, HeaderComponent, FormsModule],
   templateUrl: './sales-list.component.html',
   styleUrl: './sales-list.component.css',
 })
 export class SalesListComponent {
   salesService = inject(SalesService);
   itemService = inject(ItemService);
+  items: Item[] = [];
   router = inject(Router);
   route = inject(ActivatedRoute);
   modifySalesService = inject(ModifySalesService);
   disableAddSale = signal(true);
+  itemId = -1;
   page = 1;
   sortBy = 'salesId';
   pageSize = '10';
-  sortOrder = 'asd';
+  sortOrder = 'asc';
 
   private getParameters(): HttpParams {
     return new HttpParams()
       .set('page', this.page)
+      .set('itemId', Number(this.itemId))
       .set('sortBy', this.sortBy)
       .set('pageSize', Number(this.pageSize))
       .set('sortOrder', this.sortOrder)
@@ -37,6 +42,7 @@ export class SalesListComponent {
 
   constructor() {
     this.itemService.getItems().subscribe();
+    this.salesService.parameters = this.getParameters();
     this.salesService.getSales(true).subscribe();
   }
 
@@ -62,6 +68,7 @@ export class SalesListComponent {
     this.salesService.sales$,
   ]).pipe(
     map(([items, sales]) => {
+      this.items = items;
       return sales.map((sale) => {
         return {
           ...sale,
@@ -71,6 +78,10 @@ export class SalesListComponent {
     }),
     tap(() => this.disableAddSale.set(!this.disableAddSale))
   );
+
+  getItemsList(): Item[] {
+    return this.items;
+  }
 
   redirectToAddPage() {
     this.modifySalesService.addSales();

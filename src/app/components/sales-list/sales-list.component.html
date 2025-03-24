@@ -4,6 +4,20 @@
   Add Sale
 </button>
 <div *ngIf="salesWithItems$ | async as sales; else loading">
+  <div class="item-filter-input" *ngIf="getItemsList() as items">
+    <label for="item-filter">Item : </label>
+    <select
+      name="item-filter"
+      id="item-filter"
+      [(ngModel)]="itemId"
+      (change)="filterSales()"
+    >
+      <option [value]="-1">All</option>
+      <option *ngFor="let item of items" [value]="item.itemId">
+        {{ item.name }}
+      </option>
+    </select>
+  </div>
   <table class="sales">
     <thead>
       <th (click)="onSort('salesId')">Sales Id</th>
