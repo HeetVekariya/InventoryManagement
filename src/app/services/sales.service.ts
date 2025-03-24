@@ -112,7 +112,6 @@ export class SalesService {
           this.salesResponse = res;
           this.salesSubject.next(res.sales);
         }),
-        delay(2000),
         catchError((err) => {
           console.log((err as TimeoutError).name);
           this.salesSubject.next([]);

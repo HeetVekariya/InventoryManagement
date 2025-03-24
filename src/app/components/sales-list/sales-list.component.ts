@@ -31,6 +31,7 @@ export class SalesListComponent {
   sortBy = 'salesId';
   pageSize = '10';
   sortOrder = 'asc';
+  disableNextPage = signal(false);
 
   private getParameters(): HttpParams {
     return new HttpParams()
@@ -70,7 +71,30 @@ export class SalesListComponent {
     }
 
     this.salesService.parameters = parameters;
-    this.salesService.getSales(true).subscribe();
+    this.salesService
+      .getSales(true)
+      .pipe(
+        tap(() => {
+          this.salesService.salesResponse?.totalPages
+            ? this.page >= this.salesService.salesResponse.totalPages
+              ? this.disableNextPage.set(true)
+              : this.disableNextPage.set(false)
+            : null;
+        })
+      )
+      .subscribe();
+  }
+
+  goToPreviousPage() {
+    this.page--;
+    this.filterSales();
+  }
+
+  goToNextPage() {
+    if (!this.disableNextPage()) {
+      this.page++;
+      this.filterSales();
+    }
   }
 
   salesWithItems$ = combineLatest([
