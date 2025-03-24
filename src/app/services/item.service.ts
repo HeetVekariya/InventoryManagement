@@ -7,8 +7,6 @@ import {
 import { inject, Injectable } from '@angular/core';
 import {
   catchError,
-  combineLatest,
-  delay,
   map,
   of,
   Subject,
@@ -18,7 +16,6 @@ import {
   withLatestFrom,
 } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { CategoryService } from './category.service';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -27,7 +24,16 @@ import { Router } from '@angular/router';
 export class ItemService {
   http = inject(HttpClient);
   router = inject(Router);
-  categoryService = inject(CategoryService);
+  parameters: HttpParams = new HttpParams();
+  itemsResponse:
+    | {
+        totalRecords: number;
+        totalPages: number;
+        pageNo: number;
+        pageSize: number;
+        items: Item[];
+      }
+    | undefined;
   private itemsSubject = new Subject<Item[]>();
   items$ = this.itemsSubject.asObservable();
   private itemAddSubject = new Subject<Item>();
@@ -36,21 +42,6 @@ export class ItemService {
   itemUpdateAction$ = this.itemUpdateSubject.asObservable();
   private itemDeleteSubject = new Subject<number>();
   itemDeleteAction$ = this.itemDeleteSubject.asObservable();
-
-  itemsWithCategories$ = combineLatest([
-    this.categoryService.categories$,
-    this.items$,
-  ]).pipe(
-    map(([categories, items]) => {
-      return items.map((item) => {
-        return {
-          ...item,
-          category: categories.find((c) => c.categoryId === item.categoryId)
-            ?.name,
-        };
-      });
-    })
-  );
 
   itemsWithAdd$ = this.itemAddAction$
     .pipe(
@@ -99,21 +90,33 @@ export class ItemService {
     )
     .subscribe();
 
-  getItems() {
-    this.categoryService.getCategories().subscribe();
-    return this.http.get<Array<Item>>(`${environment.apiUrl}/items`).pipe(
-      timeout(3000),
-      tap((items) => {
-        this.itemsSubject.next(items);
-        console.log(items);
-      }),
-      delay(2000),
-      catchError((err) => {
-        console.log((err as TimeoutError).name);
-        this.itemsSubject.next([]);
-        return [];
-      })
-    );
+  getItems(isCalledFromItemList: boolean = false) {
+    return this.http
+      .get<{
+        totalRecords: number;
+        totalPages: number;
+        pageNo: number;
+        pageSize: number;
+        items: Item[];
+      }>(
+        `${environment.apiUrl}/items`,
+        isCalledFromItemList
+          ? { params: this.parameters }
+          : { params: new HttpParams().set('calledFromItemList', false) }
+      )
+      .pipe(
+        timeout(3000),
+        tap((res) => {
+          console.log(res);
+          this.itemsResponse = res;
+          this.itemsSubject.next(res.items);
+        }),
+        catchError((err) => {
+          console.log((err as TimeoutError).name);
+          this.itemsSubject.next([]);
+          return [];
+        })
+      );
   }
 
   postItem(newItem: { categoryId: number; name: string; active: boolean }) {
@@ -156,7 +159,7 @@ export class ItemService {
           if (err instanceof HttpErrorResponse) {
             if (err.status !== 204) {
               console.log('HTTP response err:', err.status);
-              of({ error: 'An error occurred while updating the category.' });
+              of({ error: 'An error occurred while updating the item.' });
             }
           }
           return of(err);
@@ -178,7 +181,7 @@ export class ItemService {
         catchError((err) => {
           if (err instanceof HttpErrorResponse) {
             console.log('HTTP response err:', err.status);
-            of({ error: 'An error occurred while deleting the category.' });
+            of({ error: 'An error occurred while deleting the item.' });
           }
           return of(err);
         })
