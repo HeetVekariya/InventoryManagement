@@ -1,12 +1,14 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ItemService } from '../../services/item.service';
 import { CommonModule, NgIf } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { tap } from 'rxjs';
+import { combineLatest, map, tap } from 'rxjs';
 import { ModifyItemsService } from '../../services/modify-items.service';
 import { HttpParams } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { Category } from '../../models/category';
+import { CategoryService } from '../../services/category.service';
 
 @Component({
   selector: 'app-item-list',
@@ -14,13 +16,16 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './item-list.component.html',
   styleUrl: './item-list.component.css',
 })
-export class ItemListComponent implements OnInit {
+export class ItemListComponent {
   itemService = inject(ItemService);
+  categoryService = inject(CategoryService);
+  categories: Category[] = [];
   router = inject(Router);
   route = inject(ActivatedRoute);
   disableAddItem = signal(true);
   modifyItemService = inject(ModifyItemsService);
   isActive = '';
+  categoryId = -1;
   page = 1;
   sortBy = 'itemId';
   pageSize = '10';
@@ -31,13 +36,15 @@ export class ItemListComponent implements OnInit {
     return new HttpParams()
       .set('page', this.page)
       .set('isActive', this.isActive)
+      .set('categoryId', Number(this.categoryId))
       .set('sortBy', this.sortBy)
       .set('pageSize', Number(this.pageSize))
       .set('sortOrder', this.sortOrder)
       .set('calledFromItemList', Boolean(true));
   }
 
-  ngOnInit(): void {
+  constructor() {
+    this.categoryService.getCategories().subscribe();
     this.itemService.parameters = this.getParameters();
     this.itemService.getItems(true).subscribe();
   }
@@ -82,9 +89,26 @@ export class ItemListComponent implements OnInit {
     }
   }
 
-  items$ = this.itemService.itemsWithCategories$.pipe(
+  itemsWithCategories$ = combineLatest([
+    this.categoryService.categories$,
+    this.itemService.items$,
+  ]).pipe(
+    map(([categories, items]) => {
+      this.categories = categories;
+      return items.map((item) => {
+        return {
+          ...item,
+          category: categories.find((c) => c.categoryId === item.categoryId)
+            ?.name,
+        };
+      });
+    }),
     tap(() => this.disableAddItem.set(!this.disableAddItem))
   );
+
+  getCategoriesList(): Category[] {
+    return this.categories;
+  }
 
   redirectToAddPage() {
     this.modifyItemService.addItem();

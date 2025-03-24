@@ -3,7 +3,7 @@
 <button [disabled]="disableAddItem()" (click)="redirectToAddPage()">
   Add Item
 </button>
-<div *ngIf="items$ | async as items; else loading">
+<div *ngIf="itemsWithCategories$ | async as items; else loading">
   <div class="is-available-filter-input">
     <label for="is-available-filter">Is Available ? : </label>
     <select
@@ -15,6 +15,20 @@
       <option value="">All</option>
       <option value="true">True</option>
       <option value="false">False</option>
+    </select>
+  </div>
+  <div class="category-filter-input" *ngIf="getCategoriesList() as categories">
+    <label for="category-filter">Category : </label>
+    <select
+      name="category-filter"
+      id="category-filter"
+      [(ngModel)]="categoryId"
+      (change)="filterItems()"
+    >
+      <option [value]="-1">All</option>
+      <option *ngFor="let category of categories" [value]="category.categoryId">
+        {{ category.name }}
+      </option>
     </select>
   </div>
   <table class="items">
