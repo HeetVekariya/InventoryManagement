@@ -3,7 +3,7 @@
 <button [disabled]="disableAddSale()" (click)="redirectToAddPage()">
   Add Sale
 </button>
-<div *ngIf="sales$ | async as sales; else loading">
+<div *ngIf="salesWithItems$ | async as sales; else loading">
   <table class="sales">
     <thead>
       <th>Sales Id</th>

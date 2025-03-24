@@ -7,7 +7,6 @@ import {
 import { inject, Injectable } from '@angular/core';
 import {
   catchError,
-  combineLatest,
   delay,
   map,
   of,
@@ -18,7 +17,6 @@ import {
   withLatestFrom,
 } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { ItemService } from './item.service';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -27,7 +25,6 @@ import { Router } from '@angular/router';
 export class SalesService {
   http = inject(HttpClient);
   router = inject(Router);
-  itemService = inject(ItemService);
   private salesSubject = new Subject<Sales[]>();
   sales$ = this.salesSubject.asObservable();
   private salesAddSubject = new Subject<Sales>();
@@ -36,17 +33,6 @@ export class SalesService {
   salesUpdateAction$ = this.salesUpdateSubject.asObservable();
   private salesDeleteSubject = new Subject<number>();
   salesDeleteAction$ = this.salesDeleteSubject.asObservable();
-
-  salesWithItems$ = combineLatest([this.itemService.items$, this.sales$]).pipe(
-    map(([items, sales]) => {
-      return sales.map((sale) => {
-        return {
-          ...sale,
-          item: items.find((item) => item.itemId === sale.itemId)?.name,
-        };
-      });
-    })
-  );
 
   salesWithAdd$ = this.salesAddAction$
     .pipe(
@@ -96,7 +82,6 @@ export class SalesService {
     .subscribe();
 
   getSales() {
-    this.itemService.getItems().subscribe();
     return this.http.get<Array<Sales>>(`${environment.apiUrl}/sales`).pipe(
       timeout(3000),
       tap((sales) => {
@@ -169,7 +154,7 @@ export class SalesService {
           if (err instanceof HttpErrorResponse) {
             if (err.status !== 204) {
               console.log('HTTP response err:', err.status);
-              of({ error: 'An error occurred while updating the category.' });
+              of({ error: 'An error occurred while updating the sales.' });
             }
           }
           return of(err);
@@ -192,7 +177,7 @@ export class SalesService {
         catchError((err) => {
           if (err instanceof HttpErrorResponse) {
             console.log('HTTP response err:', err.status);
-            of({ error: 'An error occurred while deleting the category.' });
+            of({ error: 'An error occurred while deleting the sales.' });
           }
           return of(err);
         })
