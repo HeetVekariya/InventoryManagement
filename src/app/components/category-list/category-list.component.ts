@@ -4,9 +4,10 @@ import { CategoryService } from '../../services/category.service';
 import { CommonModule, NgIf } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
 import { PopupFormService } from '../../services/popup-form.service';
-import { merge, tap } from 'rxjs';
+import { tap } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { DeleteConfirmationService } from '../../services/delete-confirmation.service';
 
 @Component({
   selector: 'app-category-list',
@@ -17,6 +18,7 @@ import { FormsModule } from '@angular/forms';
 export class CategoryListComponent implements OnInit {
   categoryService = inject(CategoryService);
   popupFormService = inject(PopupFormService);
+  confirmationDialogService = inject(DeleteConfirmationService);
   disableAddCategory = signal(true);
   isActive = '';
   page = 1;
@@ -95,6 +97,14 @@ export class CategoryListComponent implements OnInit {
   }
 
   deleteCategory(id: number) {
-    this.categoryService.deleteCategory(id);
+    this.confirmationDialogService
+      .openConfirmationDialogBox(
+        'All the items and sales records related to this category will be lost.'
+      )
+      .subscribe((result) => {
+        if (result) {
+          this.categoryService.deleteCategory(id);
+        }
+      });
   }
 }

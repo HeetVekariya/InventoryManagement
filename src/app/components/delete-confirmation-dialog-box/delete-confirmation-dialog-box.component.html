@@ -1,0 +1,9 @@
+<div class="confirmation-dialog-box">
+  <h3>Confirm Delete</h3>
+  <p *ngIf="warningMessage">{{ warningMessage }}</p>
+  <p>Are you sure ? You want to delete this Record.</p>
+  <div class="confirmation-operation">
+    <button class="delete" (click)="dialogRef.close(true)">Confirm</button>
+    <button (click)="dialogRef.close(false)">Cancel</button>
+  </div>
+</div>

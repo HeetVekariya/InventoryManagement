@@ -9,6 +9,7 @@ import { ItemService } from '../../services/item.service';
 import { HttpParams } from '@angular/common/http';
 import { Item } from '../../models/item';
 import { FormsModule } from '@angular/forms';
+import { DeleteConfirmationService } from '../../services/delete-confirmation.service';
 
 @Component({
   selector: 'app-sales-list',
@@ -19,6 +20,7 @@ import { FormsModule } from '@angular/forms';
 export class SalesListComponent {
   salesService = inject(SalesService);
   itemService = inject(ItemService);
+  confirmationDialogService = inject(DeleteConfirmationService);
   items: Item[] = [];
   router = inject(Router);
   route = inject(ActivatedRoute);
@@ -137,6 +139,12 @@ export class SalesListComponent {
   }
 
   deleteSales(id: number) {
-    this.salesService.deleteSales(id);
+    this.confirmationDialogService
+      .openConfirmationDialogBox()
+      .subscribe((result) => {
+        if (result) {
+          this.salesService.deleteSales(id);
+        }
+      });
   }
 }
