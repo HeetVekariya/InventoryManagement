@@ -3,15 +3,47 @@
 <button [disabled]="disableAddSale()" (click)="redirectToAddPage()">
   Add Sale
 </button>
-<div *ngIf="sales$ | async as sales; else loading">
+<div *ngIf="salesWithItems$ | async as sales; else loading">
+  <div class="item-filter-input" *ngIf="getItemsList() as items">
+    <label for="item-filter">Item : </label>
+    <select
+      name="item-filter"
+      id="item-filter"
+      [(ngModel)]="itemId"
+      (change)="filterSales()"
+    >
+      <option [value]="-1">All</option>
+      <option *ngFor="let item of items" [value]="item.itemId">
+        {{ item.name }}
+      </option>
+    </select>
+  </div>
+  <div class="start-date-filter-input">
+    <label for="start-date-filter">From : </label>
+    <input
+      id="start-date-filter"
+      type="date"
+      [(ngModel)]="startDate"
+      (change)="filterSales()"
+    />
+  </div>
+  <div class="end-date-filter-input">
+    <label for="end-date-filter">To : </label>
+    <input
+      id="end-date-filter"
+      type="date"
+      [(ngModel)]="endDate"
+      (change)="filterSales()"
+    />
+  </div>
   <table class="sales">
     <thead>
-      <th>Sales Id</th>
-      <th>Item</th>
-      <th>Price</th>
-      <th>Quantity</th>
-      <th>Sales Amount</th>
-      <th>Sales Date</th>
+      <th (click)="onSort('salesId')">Sales Id</th>
+      <th (click)="onSort('itemName')">Item</th>
+      <th (click)="onSort('price')">Price</th>
+      <th (click)="onSort('quantity')">Quantity</th>
+      <th (click)="onSort('salesAmount')">Sales Amount</th>
+      <th (click)="onSort('salesDate')">Sales Date</th>
     </thead>
     <tbody *ngFor="let sale of sales">
       <tr>
@@ -28,6 +60,40 @@
       </tr>
     </tbody>
   </table>
+  <div class="page-size-filter-input">
+    <select
+      name="page-size-filter"
+      id="page-size-filter"
+      [(ngModel)]="pageSize"
+      (change)="filterSales()"
+    >
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="15">15</option>
+      <option value="20">20</option>
+    </select>
+  </div>
+  <div class="page-number-filter-input">
+    <button
+      name="previous-page"
+      id="previous-page"
+      (click)="goToPreviousPage()"
+      [disabled]="page == 1"
+    >
+      Previous
+    </button>
+    <button name="current-page" id="current-page">
+      {{ page }}
+    </button>
+    <button
+      name="next-page"
+      id="next-page"
+      (click)="goToNextPage()"
+      [disabled]="disableNextPage()"
+    >
+      Next
+    </button>
+  </div>
 </div>
 
 <ng-template #loading>

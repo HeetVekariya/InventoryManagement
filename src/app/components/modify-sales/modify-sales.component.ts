@@ -27,7 +27,7 @@ export class ModifySalesComponent {
   isAddOperation = this.modifySalesService.isAddOperation;
   updateSales = this.modifySalesService.updateSales;
 
-  items$ = this.itemService.itemsWithCategories$.pipe(
+  items$ = this.itemService.items$.pipe(
     shareReplay(1),
     tap((items) => console.log(items))
   );
