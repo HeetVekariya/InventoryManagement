@@ -6,6 +6,7 @@ import { combineLatest, map, tap } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModifySalesService } from '../../services/modify-sales.service';
 import { ItemService } from '../../services/item.service';
+import { HttpParams } from '@angular/common/http';
 
 @Component({
   selector: 'app-sales-list',
@@ -20,10 +21,40 @@ export class SalesListComponent {
   route = inject(ActivatedRoute);
   modifySalesService = inject(ModifySalesService);
   disableAddSale = signal(true);
+  page = 1;
+  sortBy = 'salesId';
+  pageSize = '10';
+  sortOrder = 'asd';
+
+  private getParameters(): HttpParams {
+    return new HttpParams()
+      .set('page', this.page)
+      .set('sortBy', this.sortBy)
+      .set('pageSize', Number(this.pageSize))
+      .set('sortOrder', this.sortOrder)
+      .set('calledFromSalesList', Boolean(true));
+  }
 
   constructor() {
     this.itemService.getItems().subscribe();
-    this.salesService.getSales().subscribe();
+    this.salesService.getSales(true).subscribe();
+  }
+
+  onSort(sortBy: string) {
+    if (this.sortBy === sortBy) {
+      this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortBy = sortBy;
+    }
+
+    this.filterSales();
+  }
+
+  filterSales() {
+    let parameters = this.getParameters();
+
+    this.salesService.parameters = parameters;
+    this.salesService.getSales(true).subscribe();
   }
 
   salesWithItems$ = combineLatest([

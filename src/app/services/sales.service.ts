@@ -25,6 +25,16 @@ import { Router } from '@angular/router';
 export class SalesService {
   http = inject(HttpClient);
   router = inject(Router);
+  parameters: HttpParams = new HttpParams();
+  salesResponse:
+    | {
+        totalRecords: number;
+        totalPages: number;
+        pageNo: number;
+        pageSize: number;
+        sales: Sales[];
+      }
+    | undefined;
   private salesSubject = new Subject<Sales[]>();
   sales$ = this.salesSubject.asObservable();
   private salesAddSubject = new Subject<Sales>();
@@ -81,20 +91,34 @@ export class SalesService {
     )
     .subscribe();
 
-  getSales() {
-    return this.http.get<Array<Sales>>(`${environment.apiUrl}/sales`).pipe(
-      timeout(3000),
-      tap((sales) => {
-        this.salesSubject.next(sales);
-        console.log(sales);
-      }),
-      delay(2000),
-      catchError((err) => {
-        console.log((err as TimeoutError).name);
-        this.salesSubject.next([]);
-        return [];
-      })
-    );
+  getSales(isCalledFromSalesList: boolean = false) {
+    return this.http
+      .get<{
+        totalRecords: number;
+        totalPages: number;
+        pageNo: number;
+        pageSize: number;
+        sales: Sales[];
+      }>(
+        `${environment.apiUrl}/sales`,
+        isCalledFromSalesList
+          ? { params: this.parameters }
+          : { params: new HttpParams().set('calledFromSalesList', false) }
+      )
+      .pipe(
+        timeout(3000),
+        tap((res) => {
+          console.log(res);
+          this.salesResponse = res;
+          this.salesSubject.next(res.sales);
+        }),
+        delay(2000),
+        catchError((err) => {
+          console.log((err as TimeoutError).name);
+          this.salesSubject.next([]);
+          return [];
+        })
+      );
   }
 
   postSales(newSales: {

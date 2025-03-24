@@ -6,12 +6,12 @@
 <div *ngIf="salesWithItems$ | async as sales; else loading">
   <table class="sales">
     <thead>
-      <th>Sales Id</th>
-      <th>Item</th>
-      <th>Price</th>
-      <th>Quantity</th>
-      <th>Sales Amount</th>
-      <th>Sales Date</th>
+      <th (click)="onSort('salesId')">Sales Id</th>
+      <th (click)="onSort('itemName')">Item</th>
+      <th (click)="onSort('price')">Price</th>
+      <th (click)="onSort('quantity')">Quantity</th>
+      <th (click)="onSort('salesAmount')">Sales Amount</th>
+      <th (click)="onSort('salesDate')">Sales Date</th>
     </thead>
     <tbody *ngFor="let sale of sales">
       <tr>
