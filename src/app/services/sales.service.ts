@@ -37,10 +37,7 @@ export class SalesService {
   private salesDeleteSubject = new Subject<number>();
   salesDeleteAction$ = this.salesDeleteSubject.asObservable();
 
-  salesWithItems$ = combineLatest([
-    this.itemService.itemsWithCategories$,
-    this.sales$,
-  ]).pipe(
+  salesWithItems$ = combineLatest([this.itemService.items$, this.sales$]).pipe(
     map(([items, sales]) => {
       return sales.map((sale) => {
         return {
