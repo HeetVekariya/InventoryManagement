@@ -13,6 +13,7 @@ import { ItemService } from '../../services/item.service';
 import { Router } from '@angular/router';
 import { Item } from '../../models/item';
 import { ModifyItemsService } from '../../services/modify-items.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-modify-items',
@@ -24,6 +25,7 @@ export class ModifyItemsComponent {
   router = inject(Router);
   itemService = inject(ItemService);
   modifyItemService = inject(ModifyItemsService);
+  toastService = inject(ToastrService);
   isAddOperation = this.modifyItemService.isAddOperation;
   updateItem = this.modifyItemService.updateItem;
 
@@ -58,7 +60,7 @@ export class ModifyItemsComponent {
       let newItem = {
         categoryId: this.itemForm.controls.categoryId.value
           ? Number(this.itemForm.controls.categoryId.value)
-          : -1, // value is a number,
+          : -1,
         name: this.itemForm.controls.itemName.value
           ? this.itemForm.controls.itemName.value
           : '',
@@ -73,19 +75,17 @@ export class ModifyItemsComponent {
     if (this.itemForm.valid) {
       if (
         this.itemForm.controls.itemName.value === this.updateItem?.name &&
-        this.itemForm.controls.categoryId.value ===
+        Number(this.itemForm.controls.categoryId.value) ===
           this.updateItem?.categoryId &&
         this.itemForm.controls.isAvailable.value ===
           String(this.updateItem?.active)
       ) {
-        // show alert
-        console.log('No changes has been made');
-        this.goToItemsPage();
+        this.toastService.info('No changes has been made.', 'Info');
       } else {
         const updatedItem: Item = {
           itemId: this.updateItem?.itemId ? this.updateItem?.itemId : -1,
           categoryId: this.itemForm.controls.categoryId.value
-            ? this.itemForm.controls.categoryId.value
+            ? Number(this.itemForm.controls.categoryId.value)
             : -1,
           name: this.itemForm.controls.itemName.value
             ? this.itemForm.controls.itemName.value

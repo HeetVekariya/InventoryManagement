@@ -12,6 +12,7 @@ import { ItemService } from '../../services/item.service';
 import { shareReplay, tap } from 'rxjs';
 import { SalesService } from '../../services/sales.service';
 import { ModifySalesService } from '../../services/modify-sales.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-modify-sales',
@@ -24,6 +25,7 @@ export class ModifySalesComponent {
   private itemService = inject(ItemService);
   salesService = inject(SalesService);
   modifySalesService = inject(ModifySalesService);
+  toastService = inject(ToastrService);
   isAddOperation = this.modifySalesService.isAddOperation;
   updateSales = this.modifySalesService.updateSales;
 
@@ -90,21 +92,20 @@ export class ModifySalesComponent {
   onSubmitEditSales() {
     if (this.salesForm.valid) {
       if (
-        this.salesForm.controls.itemId.value === this.updateSales?.itemId &&
+        Number(this.salesForm.controls.itemId.value) ===
+          this.updateSales?.itemId &&
         this.salesForm.controls.price.value === this.updateSales?.price &&
         this.salesForm.controls.quantity.value === this.updateSales?.quantity &&
         this.salesForm.controls.salesAmount.value ===
           this.updateSales?.salesAmount &&
         this.salesForm.controls.salesDate.value === this.updateSales?.salesDate
       ) {
-        // show alert
-        console.log('No changes has been made');
-        this.goToSalesPage();
+        this.toastService.info('No changes has been made.', 'Info');
       } else {
         const updatedSale = {
           salesId: this.updateSales?.salesId ? this.updateSales?.salesId : -1,
           itemId: this.salesForm.controls.itemId.value
-            ? this.salesForm.controls.itemId.value
+            ? Number(this.salesForm.controls.itemId.value)
             : -1,
           price: this.salesForm.controls.price.value
             ? this.salesForm.controls.price.value
