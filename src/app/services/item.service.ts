@@ -8,7 +8,6 @@ import { inject, Injectable } from '@angular/core';
 import {
   catchError,
   map,
-  of,
   Subject,
   tap,
   timeout,
@@ -17,6 +16,7 @@ import {
 } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root',
@@ -34,6 +34,7 @@ export class ItemService {
         items: Item[];
       }
     | undefined;
+  private toastService = inject(ToastrService);
   private itemsSubject = new Subject<Item[]>();
   items$ = this.itemsSubject.asObservable();
   private itemAddSubject = new Subject<Item>();
@@ -112,7 +113,16 @@ export class ItemService {
           this.itemsSubject.next(res.items);
         }),
         catchError((err) => {
-          console.log((err as TimeoutError).name);
+          if (err instanceof TimeoutError) {
+            this.toastService.error('Internal server error.', 'Fail');
+          } else if (err instanceof HttpErrorResponse) {
+            this.toastService.error(
+              `Server responded with code ${err.status}`,
+              'Fail'
+            );
+          } else {
+            console.log(err);
+          }
           this.itemsSubject.next([]);
           return [];
         })
@@ -132,9 +142,21 @@ export class ItemService {
         }),
         catchError((err) => {
           if (err instanceof TimeoutError) {
-            console.log({ message: 'Server error' });
+            this.toastService.error('Internal server error.', 'Fail');
+          } else if (err instanceof HttpErrorResponse) {
+            if (err.status === 400) {
+              this.toastService.error(
+                `Cannot have duplicate items in the same category.`,
+                'Fail'
+              );
+            } else {
+              this.toastService.error(
+                `Server responded with code ${err.status}`,
+                'Fail'
+              );
+            }
           } else {
-            console.log((err as HttpErrorResponse).message);
+            console.log(err);
           }
           return [];
         })
@@ -143,6 +165,10 @@ export class ItemService {
         if (createdItem) {
           this.itemAddSubject.next(createdItem);
           this.router.navigate(['items']);
+          this.toastService.success(
+            `Successfully added item ${createdItem.name}.`,
+            'Success'
+          );
         }
       });
   }
@@ -156,19 +182,32 @@ export class ItemService {
         timeout(3000),
         map(() => item),
         catchError((err) => {
-          if (err instanceof HttpErrorResponse) {
-            if (err.status !== 204) {
-              console.log('HTTP response err:', err.status);
-              of({ error: 'An error occurred while updating the item.' });
+          if (err instanceof TimeoutError) {
+            this.toastService.error('Internal server error.', 'Fail');
+          } else if (err instanceof HttpErrorResponse && err.status !== 204) {
+            if (err.status === 500) {
+              // this condition needs to be corrected
+              this.toastService.error(
+                'Cannot have duplicate items in the same category.',
+                'Fail'
+              );
+            } else {
+              this.toastService.error(
+                `Server responded with code ${err.status}`,
+                'Fail'
+              );
             }
+          } else {
+            console.log(err);
           }
-          return of(err);
+          return [];
         })
       )
-      .subscribe((itemOrError) => {
-        if (itemOrError && !(itemOrError instanceof Error)) {
-          this.itemUpdateSubject.next(itemOrError);
+      .subscribe((updatedItem) => {
+        if (updatedItem) {
+          this.itemUpdateSubject.next(updatedItem);
           this.router.navigate(['items']);
+          this.toastService.success(`Successfully updated item.`, 'Success');
         }
       });
   }
@@ -178,17 +217,29 @@ export class ItemService {
       .delete(`${environment.apiUrl}/items/${id}`)
       .pipe(
         timeout(3000),
+        map(() => id),
         catchError((err) => {
-          if (err instanceof HttpErrorResponse) {
-            console.log('HTTP response err:', err.status);
-            of({ error: 'An error occurred while deleting the item.' });
+          if (err instanceof TimeoutError) {
+            this.toastService.error('Internal server error.', 'Fail');
+          } else if (err instanceof HttpErrorResponse) {
+            if (err.status === 404) {
+              this.toastService.error('Item does not exists.', 'Fail');
+            } else {
+              this.toastService.error(
+                `Server responded with code ${err.status}`,
+                'Fail'
+              );
+            }
+          } else {
+            console.log(err);
           }
-          return of(err);
+          return [];
         })
       )
-      .subscribe((res) => {
-        if (!(res instanceof Error)) {
+      .subscribe((id) => {
+        if (id) {
           this.itemDeleteSubject.next(id);
+          this.toastService.success(`Successfully deleted item.`, 'Success');
         }
       });
   }
