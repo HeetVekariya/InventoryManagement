@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import {
   catchError,
-  delay,
   map,
   of,
   Subject,
@@ -17,6 +16,7 @@ import {
   HttpParams,
 } from '@angular/common/http';
 import { environment } from '../../environments/environment';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root',
@@ -33,6 +33,7 @@ export class CategoryService {
         categories: Category[];
       }
     | undefined;
+  private toastService = inject(ToastrService);
   private categoriesSubject = new Subject<Category[]>();
   categories$ = this.categoriesSubject.asObservable();
   private categoryAddSubject = new Subject<Category>();
@@ -116,7 +117,16 @@ export class CategoryService {
           this.categoriesSubject.next(res.categories);
         }),
         catchError((err) => {
-          console.log((err as TimeoutError).name);
+          if (err instanceof TimeoutError) {
+            this.toastService.error('Internal server error.', 'Fail');
+          } else if (err instanceof HttpErrorResponse) {
+            this.toastService.error(
+              `Server responded with code ${err.status}`,
+              'Fail'
+            );
+          } else {
+            console.log(err);
+          }
           this.categoriesSubject.next([]);
           return [];
         })
@@ -137,9 +147,21 @@ export class CategoryService {
         }),
         catchError((err) => {
           if (err instanceof TimeoutError) {
-            console.log({ message: 'Server error' });
+            this.toastService.error('Internal server error.', 'Fail');
+          } else if (err instanceof HttpErrorResponse) {
+            if (err.status === 400) {
+              this.toastService.error(
+                `Category ${newCategory.name} already exists.`,
+                'Fail'
+              );
+            } else {
+              this.toastService.error(
+                `Server responded with code ${err.status}`,
+                'Fail'
+              );
+            }
           } else {
-            console.log((err as HttpErrorResponse).error);
+            console.log(err);
           }
           return [];
         })
@@ -147,6 +169,10 @@ export class CategoryService {
       .subscribe((createdCategory) => {
         if (createdCategory) {
           this.categoryAddSubject.next(createdCategory);
+          this.toastService.success(
+            `Successfully added category ${createdCategory.name}.`,
+            'Success'
+          );
         }
       });
   }
@@ -160,18 +186,33 @@ export class CategoryService {
         timeout(3000),
         map(() => category),
         catchError((err) => {
-          if (err instanceof HttpErrorResponse) {
-            if (err.status !== 204) {
-              console.log('HTTP response err:', err.status);
-              of({ error: 'An error occurred while updating the category.' });
+          if (err instanceof TimeoutError) {
+            this.toastService.error('Internal server error.', 'Fail');
+          } else if (err instanceof HttpErrorResponse && err.status !== 204) {
+            if (err.status === 500) {
+              this.toastService.error(
+                'Each category should have unique name.',
+                'Fail'
+              );
+            } else {
+              this.toastService.error(
+                `Server responded with code ${err.status}`,
+                'Fail'
+              );
             }
+          } else {
+            console.log(err);
           }
-          return of(err);
+          return [];
         })
       )
-      .subscribe((categoryOrError) => {
-        if (categoryOrError && !(categoryOrError instanceof Error)) {
-          this.categoryUpdateSubject.next(categoryOrError);
+      .subscribe((updatedCategory) => {
+        if (updatedCategory) {
+          this.categoryUpdateSubject.next(updatedCategory);
+          this.toastService.success(
+            'Successfully updated category.',
+            'Success'
+          );
         }
       });
   }
@@ -181,18 +222,32 @@ export class CategoryService {
       .delete(`${environment.apiUrl}/categories/${id}`)
       .pipe(
         timeout(3000),
+        map(() => id),
         catchError((err) => {
-          if (err instanceof HttpErrorResponse) {
-            console.log('HTTP response err:', err.status);
-            of({ error: 'An error occurred while deleting the category.' });
+          if (err instanceof TimeoutError) {
+            this.toastService.error('Internal server error.', 'Fail');
+          } else if (err instanceof HttpErrorResponse) {
+            if (err.status === 404) {
+              this.toastService.error('Category does not exists.', 'Fail');
+            } else {
+              this.toastService.error(
+                `Server responded with code ${err.status}`,
+                'Fail'
+              );
+            }
+          } else {
+            console.log(err);
           }
-          return of(err);
+          return [];
         })
       )
-      .subscribe((res) => {
-        if (!(res instanceof Error)) {
-          console.log(res);
+      .subscribe((id) => {
+        if (id) {
           this.categoryDeleteSubject.next(id);
+          this.toastService.success(
+            'Successfully deleted category.',
+            'Success'
+          );
         }
       });
   }
