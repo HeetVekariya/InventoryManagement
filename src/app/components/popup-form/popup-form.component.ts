@@ -9,6 +9,7 @@ import {
 import { NgIf } from '@angular/common';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../models/category';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-popup-form',
@@ -19,6 +20,7 @@ import { Category } from '../../models/category';
 export class PopupFormComponent {
   popupFormService = inject(PopupFormService);
   categoryService = inject(CategoryService);
+  toastService = inject(ToastrService);
   isAddOperation = this.popupFormService.isAddOperation;
 
   categoryForm = new FormGroup({
@@ -53,15 +55,13 @@ export class PopupFormComponent {
 
   onSubmitEditCategory() {
     if (this.categoryForm.valid) {
-      // check if changes are made or not
       if (
         this.popupFormService.updateCategory?.name ===
           this.categoryForm.controls.categoryName.value &&
         String(this.popupFormService.updateCategory?.active) ===
           this.categoryForm.controls.isAvailable.value
       ) {
-        // show alert
-        console.log('No changes has been made');
+        this.toastService.info('No changes has been made.', 'Info');
       } else {
         const updatedCategory: Category = {
           categoryId: this.popupFormService.updateCategory
