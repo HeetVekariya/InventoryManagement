@@ -10,6 +10,7 @@ import { HttpParams } from '@angular/common/http';
 import { Item } from '../../models/item';
 import { FormsModule } from '@angular/forms';
 import { DeleteConfirmationService } from '../../services/delete-confirmation.service';
+import { AuthGuardService } from '../../services/auth-guard.service';
 
 @Component({
   selector: 'app-sales-list',
@@ -21,6 +22,7 @@ export class SalesListComponent {
   salesService = inject(SalesService);
   itemService = inject(ItemService);
   confirmationDialogService = inject(DeleteConfirmationService);
+  authService = inject(AuthGuardService);
   items: Item[] = [];
   router = inject(Router);
   route = inject(ActivatedRoute);
@@ -134,6 +136,7 @@ export class SalesListComponent {
     salesDate: Date;
     insertedDate: Date;
   }) {
+    this.authService.hasValidEditAccess = true;
     this.modifySalesService.editSales(sales);
     this.router.navigate(['edit'], { relativeTo: this.route });
   }

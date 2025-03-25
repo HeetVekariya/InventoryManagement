@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { Category } from '../../models/category';
 import { CategoryService } from '../../services/category.service';
 import { DeleteConfirmationService } from '../../services/delete-confirmation.service';
+import { AuthGuardService } from '../../services/auth-guard.service';
 
 @Component({
   selector: 'app-item-list',
@@ -20,6 +21,7 @@ import { DeleteConfirmationService } from '../../services/delete-confirmation.se
 export class ItemListComponent {
   itemService = inject(ItemService);
   categoryService = inject(CategoryService);
+  authService = inject(AuthGuardService);
   confirmationDialogService = inject(DeleteConfirmationService);
   categories: Category[] = [];
   router = inject(Router);
@@ -124,6 +126,7 @@ export class ItemListComponent {
     name: string;
     active: boolean;
   }) {
+    this.authService.hasValidEditAccess = true;
     this.modifyItemService.editItem(item);
     this.router.navigate(['edit'], { relativeTo: this.route });
   }
