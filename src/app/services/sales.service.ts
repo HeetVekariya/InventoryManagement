@@ -7,7 +7,6 @@ import {
 import { inject, Injectable } from '@angular/core';
 import {
   catchError,
-  delay,
   map,
   of,
   Subject,
@@ -18,6 +17,7 @@ import {
 } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root',
@@ -35,6 +35,7 @@ export class SalesService {
         sales: Sales[];
       }
     | undefined;
+  private toastService = inject(ToastrService);
   private salesSubject = new Subject<Sales[]>();
   sales$ = this.salesSubject.asObservable();
   private salesAddSubject = new Subject<Sales>();
@@ -113,7 +114,16 @@ export class SalesService {
           this.salesSubject.next(res.sales);
         }),
         catchError((err) => {
-          console.log((err as TimeoutError).name);
+          if (err instanceof TimeoutError) {
+            this.toastService.error('Internal server error.', 'Fail');
+          } else if (err instanceof HttpErrorResponse) {
+            this.toastService.error(
+              `Server responded with code ${err.status}`,
+              'Fail'
+            );
+          } else {
+            console.log(err);
+          }
           this.salesSubject.next([]);
           return [];
         })
@@ -150,9 +160,14 @@ export class SalesService {
         }),
         catchError((err) => {
           if (err instanceof TimeoutError) {
-            console.log({ message: 'Server error' });
+            this.toastService.error('Internal server error.', 'Fail');
+          } else if (err instanceof HttpErrorResponse) {
+            this.toastService.error(
+              `Server responded with code ${err.status}`,
+              'Fail'
+            );
           } else {
-            console.log((err as HttpErrorResponse).message);
+            console.log(err);
           }
           return [];
         })
@@ -161,6 +176,10 @@ export class SalesService {
         if (createdSales) {
           this.salesAddSubject.next(createdSales);
           this.router.navigate(['sales']);
+          this.toastService.success(
+            `Successfully created new sales record.`,
+            'Success'
+          );
         }
       });
   }
@@ -174,20 +193,27 @@ export class SalesService {
         timeout(3000),
         map(() => sales),
         catchError((err) => {
-          if (err instanceof HttpErrorResponse) {
-            if (err.status !== 204) {
-              console.log('HTTP response err:', err.status);
-              of({ error: 'An error occurred while updating the sales.' });
-            }
+          if (err instanceof TimeoutError) {
+            this.toastService.error('Internal server error.', 'Fail');
+          } else if (err instanceof HttpErrorResponse && err.status !== 204) {
+            this.toastService.error(
+              `Server responded with code ${err.status}`,
+              'Fail'
+            );
+          } else {
+            console.log(err);
           }
-          return of(err);
+          return [];
         })
       )
       .subscribe((salesOrError) => {
         if (salesOrError && !(salesOrError instanceof Error)) {
           this.salesUpdateSubject.next(sales);
           this.router.navigate(['sales']);
-          console.log('req completed');
+          this.toastService.success(
+            `Successfully updated sales record.`,
+            'Success'
+          );
         }
       });
   }
@@ -197,17 +223,32 @@ export class SalesService {
       .delete(`${environment.apiUrl}/sales/${id}`)
       .pipe(
         timeout(3000),
+        map(() => id),
         catchError((err) => {
-          if (err instanceof HttpErrorResponse) {
-            console.log('HTTP response err:', err.status);
-            of({ error: 'An error occurred while deleting the sales.' });
+          if (err instanceof TimeoutError) {
+            this.toastService.error('Internal server error.', 'Fail');
+          } else if (err instanceof HttpErrorResponse) {
+            if (err.status === 404) {
+              this.toastService.error('Sales record does not exists.', 'Fail');
+            } else {
+              this.toastService.error(
+                `Server responded with code ${err.status}`,
+                'Fail'
+              );
+            }
+          } else {
+            console.log(err);
           }
-          return of(err);
+          return [];
         })
       )
-      .subscribe((res) => {
-        if (!(res instanceof Error)) {
+      .subscribe((id) => {
+        if (id) {
           this.salesDeleteSubject.next(id);
+          this.toastService.success(
+            `Successfully deleted sales record.`,
+            'Success'
+          );
         }
       });
   }
