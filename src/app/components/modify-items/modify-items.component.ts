@@ -31,8 +31,7 @@ export class ModifyItemsComponent {
 
   private categoryService = inject(CategoryService);
   categories$ = this.categoryService.categories$.pipe(
-    shareReplay(1), // To prevent incorrect rendering
-    tap((categories) => console.log(categories))
+    shareReplay(1) // To let the categories available immediately
   );
 
   constructor() {

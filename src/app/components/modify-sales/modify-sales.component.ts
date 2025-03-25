@@ -30,8 +30,7 @@ export class ModifySalesComponent {
   updateSales = this.modifySalesService.updateSales;
 
   items$ = this.itemService.items$.pipe(
-    shareReplay(1),
-    tap((items) => console.log(items))
+    shareReplay(1) // To let the items available immediately
   );
 
   constructor() {
