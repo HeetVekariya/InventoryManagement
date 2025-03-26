@@ -1,78 +1,110 @@
 <app-header></app-header>
-<p>category-list works!</p>
-<button (click)="addCategory()" [disabled]="disableAddCategory()">
-  Add Category
-</button>
-<div *ngIf="categories$ | async as categories; else loading">
-  <div class="is-available-filter-input">
-    <label for="is-available-filter">Is Available ? : </label>
-    <select
-      name="is-available-filter"
-      id="is-available-filter"
-      [(ngModel)]="isActive"
-      (change)="filterCategories()"
+<div class="categories-page">
+  <div class="categories-table">
+    <div class="top-bar">
+      <div class="category-add-operation">
+        <span>Categories</span>
+        <button
+          class="cursor"
+          (click)="addCategory()"
+          [disabled]="disableAddCategory()"
+        >
+          +
+        </button>
+      </div>
+      <div class="is-available-filter-input">
+        <label for="is-available-filter">Available: </label>
+        <select
+          name="is-available-filter"
+          id="is-available-filter"
+          [(ngModel)]="isActive"
+          (change)="filterCategories()"
+        >
+          <option value="">All</option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+      </div>
+    </div>
+    <div
+      class="categories-data"
+      *ngIf="categories$ | async as categories; else loading"
     >
-      <option value="">All</option>
-      <option value="true">True</option>
-      <option value="false">False</option>
-    </select>
-  </div>
-  <table class="categories">
-    <thead>
-      <th (click)="onSort('categoryId')">Category Id</th>
-      <th (click)="onSort('categoryName')">Category Name</th>
-      <th>Is Available</th>
-    </thead>
-    <tbody *ngFor="let category of categories">
-      <tr>
-        <td>{{ category.categoryId }}</td>
-        <td>{{ category.name }}</td>
-        <td>{{ category.active }}</td>
-        <td>
-          <button (click)="editCategory(category)">Edit</button>
-          <button (click)="deleteCategory(category.categoryId)">Delete</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <div class="page-size-filter-input">
-    <select
-      name="page-size-filter"
-      id="page-size-filter"
-      [(ngModel)]="pageSize"
-      (change)="filterCategories()"
-    >
-      <option value="5">5</option>
-      <option value="10">10</option>
-      <option value="15">15</option>
-      <option value="20">20</option>
-    </select>
-  </div>
-  <div class="page-number-filter-input">
-    <button
-      name="previous-page"
-      id="previous-page"
-      (click)="goToPreviousPage()"
-      [disabled]="page == 1"
-    >
-      Previous
-    </button>
-    <button name="current-page" id="current-page">
-      {{ page }}
-    </button>
-    <button
-      name="next-page"
-      id="next-page"
-      (click)="goToNextPage()"
-      [disabled]="disableNextPage()"
-    >
-      Next
-    </button>
+      <table>
+        <thead>
+          <th class="category-id cursor" (click)="onSort('categoryId')">Id</th>
+          <th class="category-name cursor" (click)="onSort('categoryName')">
+            Name
+          </th>
+          <th class="category-available">Available</th>
+          <th class="category-operation">Actions</th>
+        </thead>
+        <tbody *ngFor="let category of categories">
+          <tr>
+            <td>{{ category.categoryId }}</td>
+            <td>{{ category.name }}</td>
+            <td>{{ category.active ? 'Yes' : 'No' }}</td>
+            <td>
+              <img
+                class="cursor"
+                src="edit_icon.png"
+                alt="edit-icon"
+                (click)="editCategory(category)"
+              />
+              <img
+                class="cursor"
+                src="delete_icon.png"
+                alt="delete-icon"
+                (click)="deleteCategory(category.categoryId)"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #loading>
+      <div class="loading-container">
+        <img src="loading.gif" alt="Loading..." />
+      </div>
+    </ng-template>
+    <div class="bottom-bar">
+      <div class="page-number-filter-input">
+        <button
+          class="cursor"
+          name="previous-page"
+          id="previous-page"
+          (click)="goToPreviousPage()"
+          [disabled]="page == 1"
+        >
+          Previous
+        </button>
+        <span name="current-page" id="current-page">
+          {{ page }}
+        </span>
+        <button
+          class="cursor"
+          name="next-page"
+          id="next-page"
+          (click)="goToNextPage()"
+          [disabled]="disableNextPage()"
+        >
+          Next
+        </button>
+      </div>
+      <div class="page-size-filter-input">
+        <label for="page-size-filter">Page Size:</label>
+        <select
+          name="page-size-filter"
+          id="page-size-filter"
+          [(ngModel)]="pageSize"
+          (change)="filterCategories()"
+        >
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+        </select>
+      </div>
+    </div>
   </div>
 </div>
-
-<ng-template #loading>
-  <div class="loading-container">
-    <img src="loading.gif" alt="Loading..." />
-  </div>
-</ng-template>
