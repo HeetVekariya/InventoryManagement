@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { HeaderComponent } from '../header/header.component';
+import { AuthService } from '@auth0/auth0-angular';
 
 @Component({
   selector: 'app-landing-page',
@@ -7,4 +8,6 @@ import { HeaderComponent } from '../header/header.component';
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.css',
 })
-export class LandingPageComponent {}
+export class LandingPageComponent {
+  authService = inject(AuthService);
+}

@@ -1,2 +1,20 @@
 <app-header />
-<p>landing-page works!</p>
+<div class="landing-page">
+  <div class="introduction">
+    <h3>InvenTrack</h3>
+    <p>
+      Manage your inventory seamlessly with our system. Easily track categories,
+      manage items, and monitor sales in real-time. Stay organized and optimize
+      your business operations with efficient control over stock, orders, and
+      sales data.
+    </p>
+    <button
+      (click)="authService.loginWithRedirect({ appState: { target: '/home' } })"
+    >
+      Get Started
+    </button>
+  </div>
+  <div class="hero-banner">
+    <img src="hero_banner.jpg" alt="hero-banner" />
+  </div>
+</div>
