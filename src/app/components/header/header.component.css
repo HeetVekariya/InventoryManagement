@@ -6,7 +6,8 @@ nav {
   justify-content: space-between;
   align-items: center;
   background-color: #034c53;
-  border-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
   color: white;
 }
 
