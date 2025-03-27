@@ -26,9 +26,7 @@ export class ModifyItemsComponent {
   itemService = inject(ItemService);
   modifyItemService = inject(ModifyItemsService);
   toastService = inject(ToastrService);
-  isAddOperation = this.modifyItemService.isAddOperation
-    ? this.modifyItemService.isAddOperation
-    : true;
+  isAddOperation = this.modifyItemService.isAddOperation;
   updateItem = this.modifyItemService.updateItem;
 
   private categoryService = inject(CategoryService);
