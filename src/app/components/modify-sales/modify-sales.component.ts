@@ -2,9 +2,11 @@ import { Component, inject } from '@angular/core';
 import { HeaderComponent } from '../header/header.component';
 import { Router } from '@angular/router';
 import {
+  AbstractControl,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
@@ -13,6 +15,20 @@ import { shareReplay, tap } from 'rxjs';
 import { SalesService } from '../../services/sales.service';
 import { ModifySalesService } from '../../services/modify-sales.service';
 import { ToastrService } from 'ngx-toastr';
+
+const checkPositiveValue = () => {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+
+    if (value !== null && Number(value) >= 0) {
+      return null;
+    }
+
+    return {
+      negativeValue: true,
+    };
+  };
+};
 
 @Component({
   selector: 'app-modify-sales',
@@ -44,15 +60,15 @@ export class ModifySalesComponent {
     ),
     price: new FormControl(
       this.isAddOperation ? null : this.updateSales?.price,
-      [Validators.required]
+      [Validators.required, checkPositiveValue()]
     ),
     quantity: new FormControl(
       this.isAddOperation ? null : this.updateSales?.quantity,
-      [Validators.required]
+      [Validators.required, checkPositiveValue()]
     ),
     salesAmount: new FormControl(
       this.isAddOperation ? null : this.updateSales?.salesAmount,
-      [Validators.required]
+      [Validators.required, checkPositiveValue()]
     ),
     salesDate: new FormControl(
       this.isAddOperation ? null : this.updateSales?.salesDate,

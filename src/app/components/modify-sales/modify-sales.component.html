@@ -59,9 +59,9 @@
           >
             <div
               class="error-message"
-              *ngIf="salesForm.get('price')?.hasError('required')"
+              *ngIf="salesForm.get('price')?.hasError('negativeValue')"
             >
-              Price is required.
+              Price should be valid positive value.
             </div>
           </div>
         </div>
@@ -87,9 +87,9 @@
           >
             <div
               class="error-message"
-              *ngIf="salesForm.get('quantity')?.hasError('required')"
+              *ngIf="salesForm.get('quantity')?.hasError('negativeValue')"
             >
-              Quantity is required.
+              Quantity should be valid positive value.
             </div>
           </div>
         </div>
@@ -115,9 +115,9 @@
           >
             <div
               class="error-message"
-              *ngIf="salesForm.get('salesAmount')?.hasError('required')"
+              *ngIf="salesForm.get('salesAmount')?.hasError('negativeValue')"
             >
-              Sales amount is required.
+              Sales amount should be valid positive value.
             </div>
           </div>
         </div>
@@ -143,7 +143,7 @@
           >
             <div
               class="error-message"
-              *ngIf="salesForm.get('saleDate')?.hasError('required')"
+              *ngIf="salesForm.get('salesDate')?.hasError('required')"
             >
               Sales Date is required.
             </div>
