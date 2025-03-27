@@ -1,8 +1,41 @@
 <app-header></app-header>
-<p>home works!</p>
-<div>Functionality cards here to access the resources</div>
-<ul>
-  <li routerLink="/categories">Categories</li>
-  <li routerLink="/items">Items</li>
-  <li routerLink="/sales">Sales</li>
-</ul>
+<div class="home-page">
+  <div class="features">
+    <div class="category-card">
+      <div class="category-content">
+        <div class="title">Category</div>
+        <div class="details">
+          Manage and organize your product offerings by category. Streamline
+          inventory and track availability effortlessly.
+        </div>
+        <div class="button">
+          <button routerLink="/categories">Visit Categories</button>
+        </div>
+      </div>
+    </div>
+    <div class="item-card">
+      <div class="item-content">
+        <div class="title">Item</div>
+        <div class="details">
+          Add, update, and manage your products with ease. Keep track of item
+          details, stock levels, and pricing.
+        </div>
+        <div class="button">
+          <button routerLink="/items">Visit Items</button>
+        </div>
+      </div>
+    </div>
+    <div class="sales-card">
+      <div class="sales-content">
+        <div class="title">Sales</div>
+        <div class="details">
+          Monitor your sales performance. Access detailed transaction data,
+          including pricing, quantities, and sales trends.
+        </div>
+        <div class="button">
+          <button routerLink="/sales">Visit Sales</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

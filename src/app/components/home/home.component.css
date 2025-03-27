@@ -1,15 +1,92 @@
-ul {
+.home-page {
   display: flex;
   flex-direction: row;
-  list-style-type: none;
-  margin-right: 10px;
+  align-items: center;
+  height: calc(100% - 50px);
+  padding: 40px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #f5f5f5;
 }
 
-li {
-  padding: 5px 10px;
+.features {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.category-card {
+  width: 33%;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.category-content,
+.item-content,
+.sales-content {
+  padding: 30px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 250px;
+  border: 2px solid black;
+  border-radius: 5px;
+  max-width: 70%;
+}
+
+.category-content {
+  background-color: #e3f2fd;
+}
+
+.item-content {
+  background-color: #ffcdd2;
+}
+
+.sales-content {
+  background-color: #fff9c4;
+}
+
+.category-card .title,
+.item-card .title,
+.sales-card .title {
+  height: 15%;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.category-card .details,
+.item-card .details,
+.sales-card .details {
+  height: 70%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.category-card button,
+.item-card button,
+.sales-card button {
   cursor: pointer;
+  margin-top: 10px;
+  padding: 3px 8px;
+  background-color: #a8d5ba;
+  border: 2px solid black;
+  border-radius: 3px;
 }
 
-li:hover {
-  color: darkgreen;
+.item-card {
+  width: 33%;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.sales-card {
+  width: 33%;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  justify-content: center;
 }
