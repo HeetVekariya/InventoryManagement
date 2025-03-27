@@ -1,103 +1,139 @@
 <app-header></app-header>
-<p>sales-list works!</p>
-<button [disabled]="disableAddSale()" (click)="redirectToAddPage()">
-  Add Sale
-</button>
-<div *ngIf="salesWithItems$ | async as sales; else loading">
-  <div class="item-filter-input" *ngIf="getItemsList() as items">
-    <label for="item-filter">Item : </label>
-    <select
-      name="item-filter"
-      id="item-filter"
-      [(ngModel)]="itemId"
-      (change)="filterSales()"
+<div class="sales-page">
+  <div class="sales-table">
+    <div class="top-bar">
+      <div class="sales-add-operation">
+        <span>Sales</span>
+        <button
+          class="cursor"
+          [disabled]="disableAddSale()"
+          (click)="redirectToAddPage()"
+        >
+          +
+        </button>
+      </div>
+      <div class="filters">
+        <div class="item-filter-input" *ngIf="getItemsList() as items">
+          <label for="item-filter">Item : </label>
+          <select
+            name="item-filter"
+            id="item-filter"
+            [(ngModel)]="itemId"
+            (change)="filterSales()"
+          >
+            <option [value]="-1">All</option>
+            <option *ngFor="let item of items" [value]="item.itemId">
+              {{ item.name }}
+            </option>
+          </select>
+        </div>
+        <div class="start-date-filter-input">
+          <label for="start-date-filter">From : </label>
+          <input
+            id="start-date-filter"
+            type="date"
+            [(ngModel)]="startDate"
+            (change)="filterSales()"
+          />
+        </div>
+        <div class="end-date-filter-input">
+          <label for="end-date-filter">To : </label>
+          <input
+            id="end-date-filter"
+            type="date"
+            [(ngModel)]="endDate"
+            (change)="filterSales()"
+          />
+        </div>
+      </div>
+    </div>
+    <div
+      class="sales-data"
+      *ngIf="salesWithItems$ | async as sales; else loading"
     >
-      <option [value]="-1">All</option>
-      <option *ngFor="let item of items" [value]="item.itemId">
-        {{ item.name }}
-      </option>
-    </select>
-  </div>
-  <div class="start-date-filter-input">
-    <label for="start-date-filter">From : </label>
-    <input
-      id="start-date-filter"
-      type="date"
-      [(ngModel)]="startDate"
-      (change)="filterSales()"
-    />
-  </div>
-  <div class="end-date-filter-input">
-    <label for="end-date-filter">To : </label>
-    <input
-      id="end-date-filter"
-      type="date"
-      [(ngModel)]="endDate"
-      (change)="filterSales()"
-    />
-  </div>
-  <table class="sales">
-    <thead>
-      <th (click)="onSort('salesId')">Sales Id</th>
-      <th (click)="onSort('itemName')">Item</th>
-      <th (click)="onSort('price')">Price</th>
-      <th (click)="onSort('quantity')">Quantity</th>
-      <th (click)="onSort('salesAmount')">Sales Amount</th>
-      <th (click)="onSort('salesDate')">Sales Date</th>
-    </thead>
-    <tbody *ngFor="let sale of sales">
-      <tr>
-        <td>{{ sale.salesId }}</td>
-        <td>{{ sale.item }}</td>
-        <td>{{ sale.price }}</td>
-        <td>{{ sale.quantity }}</td>
-        <td>{{ sale.salesAmount }}</td>
-        <td>{{ sale.salesDate | date : 'longDate' }}</td>
-        <td>
-          <button (click)="redirectToEditPage(sale)">Edit</button>
-          <button (click)="deleteSales(sale.salesId)">Delete</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <div class="page-size-filter-input">
-    <select
-      name="page-size-filter"
-      id="page-size-filter"
-      [(ngModel)]="pageSize"
-      (change)="filterSales()"
-    >
-      <option value="5">5</option>
-      <option value="10">10</option>
-      <option value="15">15</option>
-      <option value="20">20</option>
-    </select>
-  </div>
-  <div class="page-number-filter-input">
-    <button
-      name="previous-page"
-      id="previous-page"
-      (click)="goToPreviousPage()"
-      [disabled]="page == 1"
-    >
-      Previous
-    </button>
-    <button name="current-page" id="current-page">
-      {{ page }}
-    </button>
-    <button
-      name="next-page"
-      id="next-page"
-      (click)="goToNextPage()"
-      [disabled]="disableNextPage()"
-    >
-      Next
-    </button>
+      <table>
+        <thead>
+          <th class="sales-id cursor" (click)="onSort('salesId')">Sales Id</th>
+          <th class="item-name cursor" (click)="onSort('itemName')">Item</th>
+          <th class="price cursor" (click)="onSort('price')">Price</th>
+          <th class="quantity cursor" (click)="onSort('quantity')">Quantity</th>
+          <th class="sales-amount cursor" (click)="onSort('salesAmount')">
+            Sales Amount
+          </th>
+          <th class="sales-date cursor" (click)="onSort('salesDate')">
+            Sales Date
+          </th>
+          <th class="sales-operation">Actions</th>
+        </thead>
+        <tbody *ngFor="let sale of sales">
+          <tr>
+            <td>{{ sale.salesId }}</td>
+            <td>{{ sale.item }}</td>
+            <td>{{ sale.price }}</td>
+            <td>{{ sale.quantity }}</td>
+            <td>{{ sale.salesAmount }}</td>
+            <td>{{ sale.salesDate | date : 'longDate' }}</td>
+            <td>
+              <img
+                class="cursor"
+                src="edit_icon.png"
+                alt="edit-icon"
+                (click)="redirectToEditPage(sale)"
+              />
+              <img
+                class="cursor"
+                src="delete_icon.png"
+                alt="delete-icon"
+                (click)="deleteSales(sale.salesId)"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #loading>
+      <div class="loading-container">
+        <img src="loading.gif" alt="Loading..." />
+      </div>
+    </ng-template>
+    <div class="bottom-bar">
+      <div class="page-number-filter-input">
+        <button
+          class="cursor"
+          name="previous-page"
+          id="previous-page"
+          (click)="goToPreviousPage()"
+          [disabled]="page == 1"
+        >
+          Previous
+        </button>
+        <span name="current-page" id="current-page">
+          {{ page }}
+        </span>
+        <button
+          class="cursor"
+          name="next-page"
+          id="next-page"
+          (click)="goToNextPage()"
+          [disabled]="disableNextPage()"
+        >
+          Next
+        </button>
+      </div>
+      <div class="page-size-filter-input">
+        <label for="page-size-filter">Page Size:</label>
+        <select
+          name="page-size-filter"
+          id="page-size-filter"
+          [(ngModel)]="pageSize"
+          (change)="filterSales()"
+        >
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+        </select>
+      </div>
+    </div>
   </div>
 </div>
-
-<ng-template #loading>
-  <div class="loading-container">
-    <img src="loading.gif" alt="Loading..." />
-  </div>
-</ng-template>

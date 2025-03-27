@@ -1,88 +1,166 @@
 <app-header></app-header>
-<p>modify-sales works!</p>
-<form [formGroup]="salesForm">
-  <div class="item-name-input">
-    <label for="item-name">item Name :</label>
-    <select name="item-name" id="item-name" formControlName="itemId">
-      <option *ngFor="let item of items$ | async" [value]="item.itemId">
-        {{ item.name }}
-      </option>
-    </select>
-    <div
-      *ngIf="
-        salesForm.get('itemId')?.invalid && salesForm.get('itemId')?.touched
-      "
-    >
-      <div *ngIf="salesForm.get('itemId')?.hasError('required')">
-        Item is required.
-      </div>
+<div class="sales-modify-page">
+  <div class="sales-form">
+    <div class="form-title">
+      <span>Sales Form</span>
+    </div>
+    <div class="form-fields">
+      <form [formGroup]="salesForm">
+        <div class="item-name-input">
+          <div class="label-container">
+            <label for="item-name">Item:</label>
+            <select
+              name="item-name"
+              id="item-name"
+              formControlName="itemId"
+              [ngClass]="{
+                'error-border':
+                  salesForm.get('itemId')?.invalid &&
+                  salesForm.get('itemId')?.touched
+              }"
+            >
+              <option *ngFor="let item of items$ | async" [value]="item.itemId">
+                {{ item.name }}
+              </option>
+            </select>
+          </div>
+          <div
+            *ngIf="
+              salesForm.get('itemId')?.invalid &&
+              salesForm.get('itemId')?.touched
+            "
+          >
+            <div
+              class="error-message"
+              *ngIf="salesForm.get('itemId')?.hasError('required')"
+            >
+              Item is required.
+            </div>
+          </div>
+        </div>
+        <div class="price-input">
+          <div class="label-container">
+            <label for="price">Price:</label>
+            <input
+              id="price"
+              type="number"
+              formControlName="price"
+              [ngClass]="{
+                'error-border':
+                  salesForm.get('price')?.invalid &&
+                  salesForm.get('price')?.touched
+              }"
+            />
+          </div>
+          <div
+            *ngIf="
+              salesForm.get('price')?.invalid && salesForm.get('price')?.touched
+            "
+          >
+            <div
+              class="error-message"
+              *ngIf="salesForm.get('price')?.hasError('required')"
+            >
+              Price is required.
+            </div>
+          </div>
+        </div>
+        <div class="quantity-input">
+          <div class="label-container">
+            <label for="quantity">Quantity:</label>
+            <input
+              id="quantity"
+              type="number"
+              formControlName="quantity"
+              [ngClass]="{
+                'error-border':
+                  salesForm.get('quantity')?.invalid &&
+                  salesForm.get('quantity')?.touched
+              }"
+            />
+          </div>
+          <div
+            *ngIf="
+              salesForm.get('quantity')?.invalid &&
+              salesForm.get('quantity')?.touched
+            "
+          >
+            <div
+              class="error-message"
+              *ngIf="salesForm.get('quantity')?.hasError('required')"
+            >
+              Quantity is required.
+            </div>
+          </div>
+        </div>
+        <div class="sales-amount-input">
+          <div class="label-container">
+            <label for="sales-amount">Sales Amount:</label>
+            <input
+              id="sales-amount"
+              type="number"
+              formControlName="salesAmount"
+              [ngClass]="{
+                'error-border':
+                  salesForm.get('salesAmount')?.invalid &&
+                  salesForm.get('salesAmount')?.touched
+              }"
+            />
+          </div>
+          <div
+            *ngIf="
+              salesForm.get('salesAmount')?.invalid &&
+              salesForm.get('salesAmount')?.touched
+            "
+          >
+            <div
+              class="error-message"
+              *ngIf="salesForm.get('salesAmount')?.hasError('required')"
+            >
+              Sales amount is required.
+            </div>
+          </div>
+        </div>
+        <div class="sales-date-input">
+          <div class="label-container">
+            <label for="sales-date">Sales Date:</label>
+            <input
+              id="sales-date"
+              type="datetime-local"
+              formControlName="salesDate"
+              [ngClass]="{
+                'error-border':
+                  salesForm.get('salesDate')?.invalid &&
+                  salesForm.get('salesDate')?.touched
+              }"
+            />
+          </div>
+          <div
+            *ngIf="
+              salesForm.get('salesDate')?.invalid &&
+              salesForm.get('salesDate')?.touched
+            "
+          >
+            <div
+              class="error-message"
+              *ngIf="salesForm.get('saleDate')?.hasError('required')"
+            >
+              Sales Date is required.
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="form-operation">
+      <button
+        class="submit-button"
+        type="submit"
+        [disabled]="salesForm.invalid"
+        (click)="isAddOperation ? onSubmitAddSales() : onSubmitEditSales()"
+      >
+        Submit
+      </button>
+      <button class="cancel-button" (click)="goToSalesPage()">Cancel</button>
     </div>
   </div>
-
-  <div class="price-input">
-    <label for="price">Price :</label>
-    <input id="price" type="number" formControlName="price" />
-    <div
-      *ngIf="salesForm.get('price')?.invalid && salesForm.get('price')?.touched"
-    >
-      <div *ngIf="salesForm.get('price')?.hasError('required')">
-        Price is required.
-      </div>
-    </div>
-  </div>
-
-  <div class="quantity-input">
-    <label for="quantity">Quantity :</label>
-    <input id="quantity" type="number" formControlName="quantity" />
-    <div
-      *ngIf="
-        salesForm.get('quantity')?.invalid && salesForm.get('quantity')?.touched
-      "
-    >
-      <div *ngIf="salesForm.get('quantity')?.hasError('required')">
-        Quantity is required.
-      </div>
-    </div>
-  </div>
-
-  <div class="sales-amount-input">
-    <label for="sales-amount">Sales Amount :</label>
-    <input id="sales-amount" type="number" formControlName="salesAmount" />
-    <div
-      *ngIf="
-        salesForm.get('salesAmount')?.invalid &&
-        salesForm.get('salesAmount')?.touched
-      "
-    >
-      <div *ngIf="salesForm.get('salesAmount')?.hasError('required')">
-        Quantity is required.
-      </div>
-    </div>
-  </div>
-
-  <div class="sales-date-input">
-    <label for="sales-date">Sales Date :</label>
-    <input id="sales-date" type="datetime-local" formControlName="salesDate" />
-    <div
-      *ngIf="
-        salesForm.get('salesDate')?.invalid &&
-        salesForm.get('salesDate')?.touched
-      "
-    >
-      <div *ngIf="salesForm.get('saleDate')?.hasError('required')">
-        Sales Date is required.
-      </div>
-    </div>
-  </div>
-
-  <div class="form-operation">
-    <button
-      type="submit"
-      [disabled]="salesForm.invalid"
-      (click)="isAddOperation ? onSubmitAddSales() : onSubmitEditSales()"
-    >
-      Submit
-    </button>
-  </div>
-</form>
-<button (click)="goToSalesPage()">Go Back</button>
+</div>
