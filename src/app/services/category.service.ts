@@ -2,7 +2,6 @@ import { inject, Injectable } from '@angular/core';
 import {
   catchError,
   map,
-  of,
   Subject,
   tap,
   timeout,
@@ -52,8 +51,8 @@ export class CategoryService {
     )
     .subscribe((categoriesWithAdd) => {
       if (categoriesWithAdd) {
-        // this.getCategories(true).subscribe();
-        this.categoriesSubject.next(categoriesWithAdd);
+        this.getCategories(true).subscribe();
+        // this.categoriesSubject.next(categoriesWithAdd);
       }
     });
 
@@ -73,8 +72,8 @@ export class CategoryService {
               ...categories.slice(updatedCategoryIndex + 1),
             ];
 
-            // this.getCategories(true).subscribe();
-            this.categoriesSubject.next(updatedCategories);
+            this.getCategories(true).subscribe();
+            // this.categoriesSubject.next(updatedCategories);
             return updatedCategories;
           }
         }
@@ -88,8 +87,8 @@ export class CategoryService {
       withLatestFrom(this.categories$),
       map(([id, categories]) => {
         const reducedCategories = categories.filter((c) => c.categoryId !== id);
-        this.categoriesSubject.next(reducedCategories);
-        // this.getCategories(true).subscribe();
+        this.getCategories(true).subscribe();
+        // this.categoriesSubject.next(reducedCategories);
         return reducedCategories;
       })
     )

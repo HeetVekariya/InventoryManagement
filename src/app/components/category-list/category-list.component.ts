@@ -1,5 +1,5 @@
 import { Category } from './../../models/category';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CategoryService } from '../../services/category.service';
 import { CommonModule, NgIf } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
@@ -15,7 +15,7 @@ import { DeleteConfirmationService } from '../../services/delete-confirmation.se
   templateUrl: './category-list.component.html',
   styleUrl: './category-list.component.css',
 })
-export class CategoryListComponent implements OnInit {
+export class CategoryListComponent {
   categoryService = inject(CategoryService);
   popupFormService = inject(PopupFormService);
   confirmationDialogService = inject(DeleteConfirmationService);
@@ -36,7 +36,7 @@ export class CategoryListComponent implements OnInit {
       .set('calledFromCategoryList', Boolean(true));
   }
 
-  ngOnInit(): void {
+  constructor() {
     this.categoryService.parameters = this.getParameters();
     this.categoryService.getCategories(true).subscribe();
   }
