@@ -15,6 +15,7 @@ export class PopupFormService {
     this.isAddOperation = true;
     this.dialogBox.open(PopupFormComponent, {
       panelClass: 'form-dialog-box',
+      backdropClass: 'backdrop',
     });
   }
 
@@ -23,6 +24,7 @@ export class PopupFormService {
     this.updateCategory = category;
     this.dialogBox.open(PopupFormComponent, {
       panelClass: 'form-dialog-box',
+      backdropClass: 'backdrop',
     });
   }
 }

@@ -1,36 +1,50 @@
 <div class="dialog-box">
-  <h3>Category Form</h3>
-  <div class="input-data">
+  <div class="form-title">
+    <span>Category Form</span>
+  </div>
+  <div class="form-fields">
     <form [formGroup]="categoryForm">
       <div class="category-name-input">
-        <label for="category-name">Category Name :</label>
-        <input id="category-name" type="text" formControlName="categoryName" />
+        <label for="category-name">Category Name:</label>
+        <input
+          id="category-name"
+          type="text"
+          formControlName="categoryName"
+          [ngClass]="{
+            'error-border':
+              categoryForm.get('categoryName')?.invalid &&
+              categoryForm.get('categoryName')?.touched
+          }"
+        />
         <div
           *ngIf="
             categoryForm.get('categoryName')?.invalid &&
             categoryForm.get('categoryName')?.touched
           "
         >
-          <div *ngIf="categoryForm.get('categoryName')?.hasError('required')">
+          <div
+            class="error-message"
+            *ngIf="categoryForm.get('categoryName')?.hasError('required')"
+          >
             Categpry Name is required.
           </div>
-          <div *ngIf="categoryForm.get('categoryName')?.hasError('minlength')">
+          <div
+            class="error-message"
+            *ngIf="categoryForm.get('categoryName')?.hasError('minlength')"
+          >
             Category Name must be at least 3 characters long.
           </div>
         </div>
       </div>
-
-      <br />
-
       <div class="is-available-input">
-        <label for="is-available">Is Available ?</label>
+        <label for="is-available">Available:</label>
         <select
           name="is-available"
           id="is-available"
           formControlName="isAvailable"
         >
-          <option value="true">True</option>
-          <option value="false">False</option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
         </select>
         <div
           *ngIf="
@@ -38,23 +52,25 @@
             categoryForm.get('isAvailable')?.touched
           "
         >
-          <div *ngIf="categoryForm.get('isAvailable')?.hasError('required')">
+          <div
+            class="error-message"
+            *ngIf="categoryForm.get('isAvailable')?.hasError('required')"
+          >
             Availability is required.
           </div>
         </div>
       </div>
-      <div class="form-operation">
-        <button
-          type="submit"
-          [disabled]="categoryForm.invalid"
-          (click)="
-            isAddOperation ? onSubmitAddCategory() : onSubmitEditCategory()
-          "
-        >
-          Submit
-        </button>
-        <button (click)="closeDialogBox()">Close</button>
-      </div>
     </form>
+  </div>
+  <div class="form-operation">
+    <button
+      class="submit-button"
+      type="submit"
+      [disabled]="categoryForm.invalid"
+      (click)="isAddOperation ? onSubmitAddCategory() : onSubmitEditCategory()"
+    >
+      Submit
+    </button>
+    <button class="cancel-button" (click)="closeDialogBox()">Cancel</button>
   </div>
 </div>
