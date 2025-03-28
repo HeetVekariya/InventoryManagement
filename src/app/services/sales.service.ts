@@ -8,7 +8,6 @@ import { inject, Injectable } from '@angular/core';
 import {
   catchError,
   map,
-  of,
   Subject,
   tap,
   timeout,
@@ -86,6 +85,7 @@ export class SalesService {
       withLatestFrom(this.sales$),
       map(([id, sales]) => {
         const reducedSales = sales.filter((sale) => sale.salesId !== id);
+        this.getSales(true).subscribe();
         this.salesSubject.next(reducedSales);
         return reducedSales;
       })
