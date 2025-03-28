@@ -115,6 +115,12 @@
           >
             <div
               class="error-message"
+              *ngIf="salesForm.get('salesAmount')?.hasError('required')"
+            >
+              Sales Date is required.
+            </div>
+            <div
+              class="error-message"
               *ngIf="salesForm.get('salesAmount')?.hasError('negativeValue')"
             >
               Sales amount should be valid positive value.
@@ -146,6 +152,19 @@
               *ngIf="salesForm.get('salesDate')?.hasError('required')"
             >
               Sales Date is required.
+            </div>
+          </div>
+          <div
+            *ngIf="
+              salesForm.get('salesDate')?.invalid &&
+              salesForm.get('salesDate')?.touched
+            "
+          >
+            <div
+              class="error-message"
+              *ngIf="salesForm.get('salesDate')?.hasError('invalidDate')"
+            >
+              Sales Date should not be in future.
             </div>
           </div>
         </div>

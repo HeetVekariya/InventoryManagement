@@ -20,13 +20,27 @@ const checkPositiveValue = () => {
   return (control: AbstractControl): ValidationErrors | null => {
     const value = control.value;
 
-    if (value !== null && Number(value) >= 0) {
-      return null;
+    if (value !== null && Number(value) < 0) {
+      return {
+        negativeValue: true,
+      };
     }
 
-    return {
-      negativeValue: true,
-    };
+    return null;
+  };
+};
+
+const checkValidSalesDate = () => {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const formDate = new Date(control.value);
+
+    if (formDate !== null && formDate > new Date()) {
+      return {
+        invalidDate: true,
+      };
+    }
+
+    return null;
   };
 };
 
@@ -72,7 +86,7 @@ export class ModifySalesComponent {
     ),
     salesDate: new FormControl(
       this.isAddOperation ? null : this.updateSales?.salesDate,
-      [Validators.required]
+      [Validators.required, checkValidSalesDate()]
     ),
   });
 
