@@ -85,7 +85,8 @@ export class ItemService {
       withLatestFrom(this.items$),
       map(([id, items]) => {
         const reducedItems = items.filter((item) => item.itemId !== id);
-        this.itemsSubject.next(reducedItems);
+        this.getItems(true).subscribe();
+        // this.itemsSubject.next(reducedItems);
         return reducedItems;
       })
     )
