@@ -11,6 +11,7 @@ import { Item } from '../../models/item';
 import { FormsModule } from '@angular/forms';
 import { DeleteConfirmationService } from '../../services/delete-confirmation.service';
 import { AuthGuardService } from '../../services/auth-guard.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-sales-list',
@@ -23,6 +24,7 @@ export class SalesListComponent {
   itemService = inject(ItemService);
   confirmationDialogService = inject(DeleteConfirmationService);
   authService = inject(AuthGuardService);
+  toastService = inject(ToastrService);
   items: Item[] = [];
   router = inject(Router);
   route = inject(ActivatedRoute);
@@ -67,11 +69,28 @@ export class SalesListComponent {
     let parameters = this.getParameters();
 
     if (this.startDate !== undefined) {
+      if (new Date(this.startDate) > new Date()) {
+        this.toastService.error('Invalid starting date.', 'Fail');
+        return;
+      }
       parameters = parameters.set('startDate', this.startDate.toString());
     }
 
     if (this.endDate !== undefined) {
+      if (new Date(this.endDate) > new Date()) {
+        this.toastService.error('Invalid ending date.', 'Fail');
+        return;
+      }
       parameters = parameters.set('endDate', this.endDate.toString());
+    }
+
+    if (
+      this.startDate !== undefined &&
+      this.endDate !== undefined &&
+      new Date(this.startDate) > new Date(this.endDate)
+    ) {
+      this.toastService.error('Invalid starting or ending date.', 'Fail');
+      return;
     }
 
     this.salesService.parameters = parameters;
