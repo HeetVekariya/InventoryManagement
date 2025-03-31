@@ -12,18 +12,29 @@
           +
         </button>
       </div>
-      <div class="is-available-filter-input">
-        <label for="is-available-filter">Available: </label>
-        <select
-          name="is-available-filter"
-          id="is-available-filter"
-          [(ngModel)]="isActive"
-          (change)="filterCategories()"
-        >
-          <option value="">All</option>
-          <option value="true">Yes</option>
-          <option value="false">No</option>
-        </select>
+      <div class="filters">
+        <div class="search-bar">
+          <label for="category-name-filter">Search: </label>
+          <input
+            (input)="filterCategories()"
+            name="category-name-filter"
+            type="text"
+            [(ngModel)]="searchTerm"
+          />
+        </div>
+        <div class="is-available-filter-input">
+          <label for="is-available-filter">Available: </label>
+          <select
+            name="is-available-filter"
+            id="is-available-filter"
+            [(ngModel)]="isActive"
+            (change)="filterCategories()"
+          >
+            <option value="">All</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+        </div>
       </div>
     </div>
     <div

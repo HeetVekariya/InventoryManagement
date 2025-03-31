@@ -20,6 +20,7 @@ export class CategoryListComponent {
   popupFormService = inject(PopupFormService);
   confirmationDialogService = inject(DeleteConfirmationService);
   disableAddCategory = signal(true);
+  searchTerm = '';
   isActive = '';
   page = 1;
   sortBy = 'categoryId';
@@ -55,6 +56,10 @@ export class CategoryListComponent {
 
     if (this.isActive !== undefined) {
       parameters = parameters.set('isActive', this.isActive);
+    }
+
+    if (this.searchTerm.trim().length !== 0) {
+      parameters = parameters.set('searchTerm', this.searchTerm.trim());
     }
 
     this.categoryService.parameters = parameters;
