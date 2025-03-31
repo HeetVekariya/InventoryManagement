@@ -13,6 +13,15 @@
         </button>
       </div>
       <div class="filters">
+        <div class="search-bar">
+          <label for="item-name-filter">Search: </label>
+          <input
+            (input)="filterItems()"
+            name="item-name-filter"
+            type="text"
+            [(ngModel)]="searchTerm"
+          />
+        </div>
         <div class="is-available-filter-input">
           <label for="is-available-filter">Available:</label>
           <select

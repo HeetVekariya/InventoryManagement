@@ -28,6 +28,7 @@ export class ItemListComponent {
   route = inject(ActivatedRoute);
   disableAddItem = signal(true);
   modifyItemService = inject(ModifyItemsService);
+  searchTerm = '';
   isActive = '';
   categoryId = -1;
   page = 1;
@@ -65,6 +66,10 @@ export class ItemListComponent {
 
   filterItems() {
     let parameters = this.getParameters();
+
+    if (this.searchTerm.trim().length !== 0) {
+      parameters = parameters.set('searchTerm', this.searchTerm.trim());
+    }
 
     this.itemService.parameters = parameters;
     this.itemService
