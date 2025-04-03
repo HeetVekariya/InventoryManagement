@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class ModifyItemsService {
-  isAddOperation: boolean | undefined;
+  isAddOperation: boolean | undefined = true;
   updateItem:
     | {
         category: string | undefined;

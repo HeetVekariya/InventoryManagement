@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class ModifySalesService {
-  isAddOperation: boolean | undefined;
+  isAddOperation: boolean | undefined = true;
   updateSales:
     | {
         salesId: number;
